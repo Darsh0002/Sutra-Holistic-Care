@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #CCA47C;
+  --color-primary-dark: #A47F5C;
+  --color-primary-light: #F5EFE6;
+  --color-bg-cream: #FAF6F0;
+  --color-bg-card: #FBF9F5;
+  --color-text-dark: #2A2725;
+  --color-text-light: #5A5550;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Base custom styles */
+@layer base {
+  body {
+    background-color: #FAF6F0;
+    color: #5A5550;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    color: #2A2725;
+  }
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(250, 246, 240, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(204, 164, 124, 0.15);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FAF6F0;
+}
+::-webkit-scrollbar-thumb {
+  background: #CCA47C;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A47F5C;
+}

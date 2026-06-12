@@ -1,31 +1,38 @@
-import React, { useState } from 'react';
-import { Menu, X, ShieldAlert, ArrowRight, Activity } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Menu,
+  X,
+  ShieldAlert,
+  ArrowRight,
+  Activity,
+  Truck,
+  MoveRight,
+} from "lucide-react";
 
 const Navbar = ({ onAdminLoginClick, currentView, onViewToggle }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { label: 'The Doctor', href: '#doctor' },
-    { label: 'Sutra Formulas', href: '#products' },
-    { label: 'Seminars', href: '#seminars' },
-    { label: 'Video Consultation', href: '#consultation' },
-    { label: 'FAQs', href: '#faq' },
+    { label: "The Doctor", href: "#doctor" },
+    { label: "Sutra Products", href: "#products" },
+    { label: "Upcoming Seminars", href: "#seminars" },
+    { label: "Video Consultation", href: "#consultation" },
   ];
 
   const handleLinkClick = (e, href) => {
     e.preventDefault();
     setIsOpen(false);
-    
-    if (currentView === 'admin') {
-      onViewToggle('patient');
+
+    if (currentView === "admin") {
+      onViewToggle("patient");
       // Wait for view toggle to render, then scroll
       setTimeout(() => {
         const el = document.querySelector(href);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        if (el) el.scrollIntoView({ behavior: "smooth" });
       }, 100);
     } else {
       const el = document.querySelector(href);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      if (el) el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -34,7 +41,10 @@ const Navbar = ({ onAdminLoginClick, currentView, onViewToggle }) => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2 cursor-pointer" onClick={(e) => handleLinkClick(e, '#hero')}>
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={(e) => handleLinkClick(e, "#hero")}
+          >
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-primary-dark">
               <Activity className="h-5 w-5" />
             </div>
@@ -62,40 +72,31 @@ const Navbar = ({ onAdminLoginClick, currentView, onViewToggle }) => {
             ))}
           </div>
 
-          {/* Action Button (Admin Login or View Toggle) */}
-          <div className="hidden md:flex items-center gap-4">
-            {currentView === 'admin' ? (
-              <button
-                onClick={() => onViewToggle('patient')}
-                className="flex items-center gap-2 rounded-full border border-primary text-primary-dark hover:bg-primary/10 px-5 py-2 text-xs font-semibold tracking-wider uppercase transition-all duration-300"
-              >
-                Patient View
-              </button>
-            ) : (
-              <button
-                onClick={onAdminLoginClick}
-                className="flex items-center gap-1.5 rounded-full border border-primary/30 text-text-dark hover:border-primary-dark hover:text-primary-dark px-4 py-1.5 text-xs font-medium tracking-wide transition-all duration-300"
-              >
-                <ShieldAlert className="h-3.5 w-3.5" />
-                Admin Portal
-              </button>
-            )}
-
+          {/* Action Buttons (Track Order + Admin Portal) */}
+          <div className="hidden md:flex items-center gap-3">
             <a
-              href="#consultation"
-              onClick={(e) => handleLinkClick(e, '#consultation')}
-              className="flex items-center gap-2 rounded-full bg-primary text-text-dark font-medium hover:bg-primary-dark hover:text-white px-5 py-2.5 text-xs font-semibold tracking-wider uppercase shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
+              href="https://trackcourier.io/anjani-courier-tracking"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-full border border-slate-300 bg-white/60 hover:bg-white text-text-dark hover:text-indigo-700 hover:border-indigo-300 px-4 py-2.5 text-xs font-semibold tracking-wider uppercase shadow-sm transition-all duration-300 transform hover:-translate-y-0.5"
             >
-              Book Consultation
+              <Truck className="h-3.5 w-3.5" />
+              Track Order
+            </a>
+            <a
+              onClick={onAdminLoginClick}
+              className="flex items-center gap-2 rounded-full hover:cursor-pointer bg-primary text-text-dark font-medium hover:bg-primary-dark hover:text-white px-5 py-2.5 text-xs font-semibold tracking-wider uppercase shadow-md transition-all duration-300 transform hover:-translate-y-0.5"
+            >
+              Admin Portal
               <ArrowRight className="h-3.5 w-3.5" />
             </a>
           </div>
 
           {/* Mobile menu button */}
           <div className="flex md:hidden items-center gap-2">
-            {currentView === 'admin' && (
+            {currentView === "admin" && (
               <button
-                onClick={() => onViewToggle('patient')}
+                onClick={() => onViewToggle("patient")}
                 className="rounded-full border border-primary text-primary-dark px-3 py-1 text-xs font-semibold transition-all"
               >
                 Patient View
@@ -105,7 +106,11 @@ const Navbar = ({ onAdminLoginClick, currentView, onViewToggle }) => {
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center rounded-md p-2 text-text-light hover:bg-primary-light hover:text-primary-dark transition-all"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -126,7 +131,16 @@ const Navbar = ({ onAdminLoginClick, currentView, onViewToggle }) => {
               </a>
             ))}
             <div className="pt-4 flex flex-col gap-3 border-t border-primary/10 mt-4">
-              {currentView !== 'admin' && (
+              <a
+                href="https://trackcourier.io/anjani-courier-tracking"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full rounded-md border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 py-2.5 text-sm font-semibold text-indigo-700 transition-all"
+              >
+                <Truck className="h-4 w-4" />
+                Track Your Order
+              </a>
+              {currentView !== "admin" && (
                 <button
                   onClick={() => {
                     setIsOpen(false);
@@ -134,18 +148,10 @@ const Navbar = ({ onAdminLoginClick, currentView, onViewToggle }) => {
                   }}
                   className="flex items-center justify-center gap-2 w-full rounded-md border border-primary/30 py-2.5 text-sm font-medium text-text-dark"
                 >
-                  <ShieldAlert className="h-4 w-4" />
+                  <MoveRight className="h-4 w-4" />
                   Admin Portal
                 </button>
               )}
-              <a
-                href="#consultation"
-                onClick={(e) => handleLinkClick(e, '#consultation')}
-                className="flex items-center justify-center gap-2 w-full rounded-md bg-primary text-text-dark py-3 text-sm font-semibold uppercase tracking-wider text-center"
-              >
-                Book Consultation
-                <ArrowRight className="h-4 w-4" />
-              </a>
             </div>
           </div>
         </div>

@@ -1,159 +1,221 @@
-import React from 'react';
-import { MessageCircle, Info, Sparkles, Shield, Heart } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MessageCircle, Calendar, BookOpen, Sparkles, Shield, Heart, ChevronRight, Star, Truck } from 'lucide-react';
+
+// Rotating conditions the brand addresses
+const HEADLINES = [
+  { problem: "Can't sleep?",         solution: "We heal your root cause.",  emoji: "🌙" },
+  { problem: "Chronic acidity?",     solution: "Ayurveda has the answer.",  emoji: "🔥" },
+  { problem: "Joint pain daily?",    solution: "Nature relieves it gently.", emoji: "🦴" },
+  { problem: "Hormonal imbalance?",  solution: "Balance from within.",       emoji: "⚖️" },
+  { problem: "Bloating & gas?",      solution: "Your gut can heal.",         emoji: "💚" },
+  { problem: "Low energy & stress?", solution: "Reclaim your vitality.",     emoji: "⚡" },
+];
 
 const Hero = ({ onOpenIngredients }) => {
+  const [current, setCurrent] = useState(0);
+  const [fading, setFading] = useState(false);
+
+  // Rotate headline every 3 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setFading(true);
+      setTimeout(() => {
+        setCurrent(i => (i + 1) % HEADLINES.length);
+        setFading(false);
+      }, 350);
+    }, 3200);
+    return () => clearInterval(timer);
+  }, []);
+
+  const { problem, solution, emoji } = HEADLINES[current];
+
   return (
     <section id="hero" className="relative overflow-hidden bg-bg-cream pt-10 pb-16 sm:pb-24 lg:pt-16 lg:pb-32">
-      {/* Background graphic elements */}
-      <div className="absolute top-0 right-0 -z-10 h-[600px] w-[600px] rounded-full bg-radial from-primary/10 to-transparent blur-3xl" />
-      <div className="absolute bottom-0 left-0 -z-10 h-[400px] w-[400px] rounded-full bg-radial from-primary/5 to-transparent blur-2xl" />
+      {/* Background glow */}
+      <div className="absolute top-0 right-0 -z-10 h-[700px] w-[700px] rounded-full bg-radial from-primary/12 to-transparent blur-3xl" />
+      <div className="absolute bottom-0 left-0 -z-10 h-[400px] w-[400px] rounded-full bg-radial from-primary/6 to-transparent blur-2xl" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
-          
-          {/* Left Text Column */}
+
+          {/* ── LEFT TEXT COLUMN ── */}
           <div className="sm:text-center md:mx-auto md:max-w-2xl lg:col-span-7 lg:text-left">
+
+            {/* Trust badge */}
             <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary-dark">
               <Sparkles className="h-3 w-3" />
-              Trusted by 1000+ people
+              Trusted by 1000+ patients across India
             </div>
-            
-            <h1 className="mt-6 font-serif text-4xl font-extrabold tracking-tight text-text-dark sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl block leading-tight">
-              Sleep is not a luxury.
-              <span className="block text-primary mt-2">It's your foundation.</span>
+
+            {/* Rotating problem / solution headline */}
+            <h1 className="mt-6 font-serif text-4xl font-extrabold tracking-tight text-text-dark sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl leading-tight">
+              <span
+                className="block transition-all duration-350"
+                style={{ opacity: fading ? 0 : 1, transform: fading ? 'translateY(8px)' : 'translateY(0)' }}
+              >
+                <span className="mr-2">{emoji}</span>{problem}
+              </span>
+              <span className="block text-primary mt-2 transition-all duration-350"
+                style={{ opacity: fading ? 0 : 1, transform: fading ? 'translateY(8px)' : 'translateY(0)', transitionDelay: '50ms' }}
+              >
+                {solution}
+              </span>
             </h1>
-            
-            <p className="mt-6 text-base text-text-light sm:text-lg md:text-xl leading-relaxed max-w-xl">
-              A natural Ayurvedic sleep solution — no dependency, no side effects.
-              Just deep, restful sleep every night, formulated using time-tested herbs for holistic wellness.
+
+            {/* Brand promise */}
+            <p className="mt-6 text-base text-text-light sm:text-lg leading-relaxed max-w-xl">
+              <strong className="text-text-dark">Sutra Holistic Care</strong> — founded by Dr. Keval Dankhara — blends
+              classical Ayurveda, Homeopathy &amp; lifestyle medicine to treat the <em>root cause</em>, not just symptoms.
             </p>
 
-            {/* CTA Buttons */}
-            <div className="mt-10 sm:flex sm:justify-center lg:justify-start gap-4">
+            {/* Dot indicators for headline */}
+            <div className="mt-5 flex gap-1.5 sm:justify-center lg:justify-start">
+              {HEADLINES.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setFading(true); setTimeout(() => { setCurrent(i); setFading(false); }, 300); }}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? 'w-6 bg-primary-dark' : 'w-1.5 bg-primary/30'}`}
+                  aria-label={`Condition ${i + 1}`}
+                />
+              ))}
+            </div>
+
+            {/* ── CTA BUTTONS ── */}
+            <div className="mt-10 flex flex-wrap sm:justify-center lg:justify-start gap-3">
+              {/* Primary: WhatsApp */}
               <a
-                href="https://wa.me/919537051626?text=Hi%20Dr.%20Keval,%20I'm%20interested%20in%20getting%20a%20Trial%20Pack%20of%20Sleep%20Sutra."
+                href="https://wa.me/919537051626?text=Hi%20Dr.%20Keval%2C%20I%20visited%20Sutra%20Holistic%20Care%20and%20would%20like%20to%20know%20more%20about%20your%20remedies."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-lg bg-primary hover:bg-primary-dark hover:text-white px-6 py-4 text-sm font-bold tracking-wide uppercase text-text-dark shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                className="flex items-center justify-center gap-2 rounded-lg bg-primary hover:bg-primary-dark hover:text-white px-6 py-3.5 text-sm font-bold tracking-wide uppercase text-text-dark shadow-lg transition-all duration-300 hover:-translate-y-1"
               >
-                <MessageCircle className="h-5 w-5 fill-current" />
-                Get Trial Pack @ 50% OFF
+                <MessageCircle className="h-4 w-4 fill-current" />
+                Talk to Doctor — Free
               </a>
-              <button
-                onClick={onOpenIngredients}
-                className="mt-3 sm:mt-0 flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-white/40 hover:bg-white px-6 py-4 text-sm font-semibold text-text-dark shadow-sm hover:shadow transition-all duration-300 transform hover:-translate-y-1"
+
+              {/* Secondary: Book Consultation */}
+              <a
+                href="#consultation"
+                onClick={e => { e.preventDefault(); document.querySelector('#consultation')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="flex items-center justify-center gap-2 rounded-lg border border-primary/40 bg-white/60 hover:bg-white px-6 py-3.5 text-sm font-semibold text-text-dark shadow-sm transition-all duration-300 hover:-translate-y-1"
               >
-                <Info className="h-5 w-5" />
-                See Ingredients
-              </button>
+                <Calendar className="h-4 w-4" />
+                Book Consultation
+              </a>
+
+              {/* Tertiary: Seminars */}
+              <a
+                href="#seminars"
+                onClick={e => { e.preventDefault(); document.querySelector('#seminars')?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="flex items-center justify-center gap-2 rounded-lg border border-indigo-300/60 bg-indigo-50/60 hover:bg-indigo-50 px-6 py-3.5 text-sm font-semibold text-indigo-700 shadow-sm transition-all duration-300 hover:-translate-y-1"
+              >
+                <BookOpen className="h-4 w-4" />
+                Free Health Seminar
+              </a>
             </div>
 
-            {/* Badges footer */}
-            <div className="mt-12 grid grid-cols-3 gap-3 border-t border-primary/20 pt-8 max-w-lg sm:mx-auto lg:mx-0">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary-dark">
-                  <Shield className="h-4 w-4" />
+            {/* Track order link */}
+            <div className="mt-4 flex sm:justify-center lg:justify-start">
+              <a
+                href="https://trackcourier.io/anjani-courier-tracking"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/70 hover:bg-white hover:border-indigo-400 text-indigo-700 px-4 py-1.5 text-xs font-semibold tracking-wider uppercase shadow-sm transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <Truck className="h-3.5 w-3.5" /> Track Your Order
+              </a>
+            </div>
+
+            {/* Trust badges */}
+            <div className="mt-10 grid grid-cols-3 gap-3 border-t border-primary/20 pt-8 max-w-lg sm:mx-auto lg:mx-0">
+              {[
+                { icon: Shield,   text: '100% Ayurvedic' },
+                { icon: Sparkles, text: 'No Chemicals'    },
+                { icon: Heart,    text: 'Doctor Crafted'  },
+              ].map(({ icon: Icon, text }) => (
+                <div key={text} className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary-dark shrink-0">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <span className="text-xs font-semibold text-text-dark text-left">{text}</span>
                 </div>
-                <span className="text-xs font-semibold text-text-dark text-left">100% Ayurvedic</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary-dark">
-                  <Sparkles className="h-4 w-4" />
-                </div>
-                <span className="text-xs font-semibold text-text-dark text-left">No Chemicals</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary-dark">
-                  <Heart className="h-4 w-4" />
-                </div>
-                <span className="text-xs font-semibold text-text-dark text-left">Doctor Formulated</span>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Right Product Image Mockup Column */}
-          <div className="mt-12 sm:mt-16 lg:mt-0 lg:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-[380px] aspect-[4/5] rounded-3xl bg-radial from-primary/10 to-transparent p-6 transition-all duration-500 hover:scale-[1.02]">
-              {/* Card Container mimicking second image style */}
-              <div className="h-full w-full rounded-2xl bg-amber-50/70 border border-primary/10 shadow-2xl p-8 flex flex-col justify-between items-center relative overflow-hidden">
-                {/* Decorative foliage SVGs */}
-                <div className="absolute top-2 left-2 opacity-20 pointer-events-none">
-                  <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10 90C40 70 50 40 80 10C70 40 50 70 10 90Z" fill="#CCA47C" />
-                    <path d="M30 80C50 65 60 45 80 25C65 45 50 65 30 80Z" fill="#A47F5C" />
-                  </svg>
-                </div>
-                
-                {/* Background lighting */}
-                <div className="absolute -bottom-10 -right-10 h-32 w-32 rounded-full bg-primary/20 blur-xl pointer-events-none" />
+          {/* ── RIGHT VISUAL COLUMN ── */}
+          <div className="mt-14 sm:mt-16 lg:mt-0 lg:col-span-5 flex justify-center">
+            <div className="relative w-full max-w-sm">
 
-                {/* Rating badge */}
-                <div className="self-end bg-white/80 border border-primary/20 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider text-primary-dark uppercase flex items-center gap-1">
-                  <span>★</span> Best Seller
+              {/* Main card */}
+              <div className="relative rounded-3xl bg-linear-to-br from-amber-50 to-white border border-primary/15 shadow-2xl p-8 overflow-hidden">
+
+                {/* Decorative leaf */}
+                <div className="absolute top-3 right-3 opacity-10 pointer-events-none select-none text-[80px]">🌿</div>
+
+                {/* Header */}
+                <div className="relative z-10">
+                  <span className="inline-block text-[10px] font-bold tracking-widest text-primary-dark uppercase bg-primary/10 px-3 py-1 rounded-full">
+                    Sutra Holistic Care
+                  </span>
+                  <h3 className="mt-3 font-serif text-xl font-extrabold text-text-dark leading-snug">
+                    One clinic.<br />All-natural<br />Ayurvedic solutions.
+                  </h3>
+                  <p className="mt-2 text-xs text-text-light leading-relaxed">
+                    Dr. Keval Dankhara, BHMS — since 2018.
+                  </p>
                 </div>
 
-                {/* Simulated Glass/Aesthetic Jar mockup */}
-                <div className="relative my-6 group">
-                  {/* Jar body */}
-                  <div className="h-56 w-36 rounded-2xl bg-linear-to-b from-amber-950 via-amber-900 to-amber-950 shadow-2xl border-x border-amber-800 flex flex-col items-center justify-between py-6 px-3 relative overflow-hidden">
-                    {/* Gloss shine */}
-                    <div className="absolute inset-y-0 left-3 w-4 bg-linear-to-r from-white/10 to-transparent blur-[1px]" />
-                    
-                    {/* Metal Cap */}
-                    <div className="absolute -top-1 h-4 w-[110%] bg-linear-to-r from-amber-600 via-amber-400 to-amber-600 rounded-md shadow-md border-b border-amber-700" />
-                    
-                    {/* Jar Label */}
-                    <div className="w-full bg-[#1A1513] border-y border-amber-600/30 p-2.5 rounded-sm flex flex-col items-center text-center z-10">
-                      <div className="h-4 w-4 rounded-full border border-amber-500/50 flex items-center justify-center text-[7px] text-amber-500 font-serif">
-                        S
+                {/* Condition pills — the 6 Sutra products */}
+                <div className="mt-6 flex flex-wrap gap-2 relative z-10">
+                  {[
+                    { label: 'Sleep',     emoji: '🌙', color: 'bg-indigo-50 border-indigo-200 text-indigo-700'   },
+                    { label: 'Gut',       emoji: '🌿', color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+                    { label: 'Gas',       emoji: '💨', color: 'bg-sky-50 border-sky-200 text-sky-700'             },
+                    { label: 'Acidity',   emoji: '❄️', color: 'bg-cyan-50 border-cyan-200 text-cyan-700'          },
+                    { label: 'Pain',      emoji: '🦴', color: 'bg-orange-50 border-orange-200 text-orange-700'    },
+                    { label: 'Hormones',  emoji: '⚖️', color: 'bg-purple-50 border-purple-200 text-purple-700'   },
+                  ].map(({ label, emoji, color }) => (
+                    <span key={label} className={`inline-flex items-center gap-1 text-[11px] font-bold border rounded-full px-3 py-1 ${color}`}>
+                      {emoji} {label}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Offerings row */}
+                <div className="mt-6 space-y-2.5 relative z-10">
+                  {[
+                    { icon: '📦', label: 'Herbal Sutra Remedies',    sub: 'Pan-India delivery' },
+                    { icon: '🎥', label: 'Online Video Consultation', sub: 'Get Curated Treatment Plans Remotely' },
+                    { icon: '🎓', label: 'Free Health Seminars',      sub: 'Hindi & Gujarati'   },
+                  ].map(({ icon, label, sub }) => (
+                    <div key={label} className="flex items-center gap-3 bg-white/70 border border-slate-100 rounded-xl px-3.5 py-2.5">
+                      <span className="text-lg">{icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-text-dark leading-none">{label}</p>
+                        <p className="text-[10px] text-text-light mt-0.5">{sub}</p>
                       </div>
-                      <span className="text-[6px] tracking-widest text-amber-500/80 font-sans uppercase font-bold mt-1">
-                        PREMIUM
-                      </span>
-                      <h4 className="font-serif text-amber-100 font-bold text-xs tracking-wider uppercase mt-0.5 leading-none">
-                        SLEEP SUTRA
-                      </h4>
-                      <p className="text-[5px] text-amber-400/70 font-serif tracking-widest mt-1 italic">
-                        Premium Ayurvedic Sleep Powder
-                      </p>
                     </div>
-
-                    <div className="w-full flex justify-between px-2 text-[5px] text-amber-200/50 tracking-wider">
-                      <span>100% ORGANIC</span>
-                      <span>150G</span>
-                    </div>
-                  </div>
-                  
-                  {/* Floating ingredients decor items surrounding jar */}
-                  <div className="absolute -bottom-4 -left-6 bg-white/95 rounded-xl border border-primary/10 p-2 shadow-lg flex items-center gap-1.5 text-left transform -rotate-6 animate-pulse">
-                    <span className="text-base">🌾</span>
-                    <div>
-                      <h5 className="text-[8px] font-bold text-text-dark leading-none">Cardamom</h5>
-                      <span className="text-[6px] text-text-light">Deep Sleep</span>
-                    </div>
-                  </div>
-                  <div className="absolute -right-4 top-8 bg-white/95 rounded-xl border border-primary/10 p-2 shadow-lg flex items-center gap-1.5 text-left transform rotate-12">
-                    <span className="text-base">🌿</span>
-                    <div>
-                      <h5 className="text-[8px] font-bold text-text-dark leading-none">Ashwagandha</h5>
-                      <span className="text-[6px] text-text-light">Stress Relief</span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
-                {/* Subtitle / Doctor branding */}
-                <div className="text-center z-10 mt-2">
-                  <p className="text-[9px] tracking-widest text-primary-dark font-bold uppercase leading-none">
-                    SUTRA HOLISTIC FORMULAS
-                  </p>
-                  <p className="text-[8px] text-text-light font-sans mt-1">
-                    Carefully blended by Dr. Keval Dankhara
-                  </p>
+                {/* Star rating */}
+                <div className="mt-5 flex items-center gap-2 relative z-10">
+                  <div className="flex text-amber-400 text-xs">
+                    {[...Array(5)].map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-current" />)}
+                  </div>
+                  <span className="text-[11px] font-semibold text-text-dark">4.9 · 500+ reviews</span>
                 </div>
               </div>
+
+              {/* Floating badge — top right */}
+              <div className="absolute -top-3 -right-3 bg-primary text-text-dark text-[10px] font-extrabold uppercase tracking-wider rounded-full px-3 py-1.5 shadow-lg border border-white">
+                ✦ All Natural
+              </div>
+
             </div>
           </div>
-          
+
         </div>
       </div>
     </section>

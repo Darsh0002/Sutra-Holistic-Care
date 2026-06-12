@@ -1,5 +1,6 @@
 import React from 'react';
 import { MessageSquare, Calendar, Award, Star, Activity } from 'lucide-react';
+import doctorImage from '../assets/dr-keval-dankhara.png';
 
 const DoctorBio = ({ onBookClick }) => {
   const whatsappNumber = '919537051626';
@@ -17,38 +18,13 @@ const DoctorBio = ({ onBookClick }) => {
           {/* Left Column: Image with Green Foliage background (from screenshot) */}
           <div className="lg:col-span-5 flex justify-center mb-12 lg:mb-0">
             <div className="relative group">
-              {/* Green foliage textured frame using gradients */}
-              <div className="relative h-[400px] w-[320px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white transform transition-transform duration-500 group-hover:scale-[1.01] bg-linear-to-tr from-emerald-900 via-green-800 to-emerald-950">
-                {/* Simulated grass/foliage background overlay */}
-                <div className="absolute inset-0 opacity-40 mix-blend-overlay">
-                  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                    <filter id="noise">
-                      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-                      <feColorMatrix type="matrix" values="0 0 0 0 0.1   0 0 0 0 0.4   0 0 0 0 0.2  0 0 0 0.6 0" />
-                    </filter>
-                    <rect width="100%" height="100%" filter="url(#noise)" />
-                  </svg>
-                </div>
-                
-                {/* Abstract Doctor Portrait silhouette/avatar rendered elegantly with gradients */}
-                <div className="absolute bottom-0 inset-x-0 h-[300px] flex flex-col justify-end items-center">
-                  <div className="relative w-48 h-64 flex flex-col items-center">
-                    {/* Head */}
-                    <div className="w-20 h-20 rounded-full bg-orange-100/90 shadow-md flex items-center justify-center border-2 border-primary/20">
-                      <span className="font-serif text-3xl font-bold text-text-dark">DK</span>
-                    </div>
-                    {/* Stethoscope */}
-                    <div className="absolute top-16 w-28 h-20 border-b-4 border-x-4 border-slate-300 rounded-b-full opacity-80" />
-                    {/* Shoulders / Labcoat */}
-                    <div className="w-40 h-44 bg-slate-900 rounded-t-full border-t-2 border-slate-800 shadow-lg mt-2 flex justify-center pt-4">
-                      {/* Shirt collar */}
-                      <div className="w-8 h-8 bg-black rotate-45 border-r border-b border-slate-800" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Lighting and depth overlays */}
-                <div className="absolute inset-0 bg-linear-to-t from-emerald-950/60 via-transparent to-transparent" />
+              {/* Doctor Image */}
+              <div className="relative h-[400px] w-[320px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white transform transition-transform duration-500 group-hover:scale-[1.01] bg-white">
+                <img 
+                  src={doctorImage} 
+                  alt="Dr. Keval Dankhara" 
+                  className="w-full h-full object-cover object-top"
+                />
               </div>
 
               {/* 3+ Years Experience Badge (from screenshot) */}

@@ -2,7 +2,7 @@ import { api } from './api.js';
 
 /**
  * Get all active products (public endpoint)
- * Returns Product[] where each product has: id, name, description, emoji, packs[], ingredients[], benefits[], active
+ * Returns Product[] where each product has: id, name, description, image, packs[], ingredients[], benefits[], active
  */
 export const getActiveProducts = () => api.get('/user/products');
 

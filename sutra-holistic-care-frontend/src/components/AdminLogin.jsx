@@ -118,14 +118,6 @@ const AdminLogin = ({ onClose, onLoginSuccess }) => {
             </button>
           </form>
 
-          {/* Secure notice */}
-          <div className="mt-6 pt-6 border-t border-primary/10 text-center">
-            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-text-light bg-primary/10 px-2.5 py-1 rounded-md">
-              <ShieldCheck className="h-3.5 w-3.5 text-primary-dark" />
-              Secured by JWT authentication
-            </span>
-          </div>
-
         </div>
       </div>
     </div>

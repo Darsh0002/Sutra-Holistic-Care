@@ -18,6 +18,13 @@ export const getSeminar = (id) => api.get(`/user/seminars/${id}`);
 export const registerForSeminar = (registrationRequest) =>
   api.post('/user/registrations', registrationRequest);
 
+/**
+ * Create Razorpay payment order for a seminar registration
+ * Returns PaymentOrderResponse: { razorpayOrderId, referenceId, amount (paise), currency, keyId, description }
+ */
+export const createRegistrationPayment = (registrationId) =>
+  api.post(`/user/payments/registration/${registrationId}`);
+
 // ─── Admin seminar management (JWT required) ──────────────────────────────
 
 /**

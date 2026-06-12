@@ -48,6 +48,15 @@ export const getAllOrdersAdmin = () => api.get('/admin/orders');
 export const updateOrderStatusAdmin = (id, status) =>
   api.putQuery(`/admin/orders/${id}/status?status=${status}`);
 
+/**
+ * Add courier tracking ID to an order (admin)
+ * Saves trackingId on the order and sends a WhatsApp notification to the customer.
+ * @param {string} id - Order ID
+ * @param {string} trackingId - Courier tracking number
+ */
+export const addTrackingInfoAdmin = (id, trackingId) =>
+  api.putQuery(`/admin/orders/${id}/tracking?trackingId=${encodeURIComponent(trackingId)}`);
+
 // ─── Razorpay helpers ─────────────────────────────────────────
 
 /**

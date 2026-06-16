@@ -17,6 +17,7 @@ import {
   Activity,
   Truck,
 } from "lucide-react";
+import { Facebook, Instagram, Youtube } from "./components/SocialIcons";
 import {
   getActiveProducts,
   getDisplayPrice,
@@ -33,7 +34,6 @@ const App = () => {
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [adminLoggedIn, setAdminLoggedIn] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [showIngredientsModal, setShowIngredientsModal] = useState(false);
 
   // ── Navigate helper – updates state AND browser URL ─────────────────────────
   const navigateTo = (newView) => {
@@ -77,133 +77,7 @@ const App = () => {
         const data = await getActiveProducts();
         setProducts(data || []);
       } catch {
-        setProducts([
-          {
-            id: "local-1",
-            name: "Sleep Sutra Powder",
-            description: "Premium Ayurvedic sleep powder with zero dependency.",
-            packs: [{ price: 499, weight: 100 }],
-            ingredients: [
-              "Tagara Root",
-              "Ashwagandha",
-              "Jatamansi",
-              "Elaichi",
-              "Organic Oats",
-            ],
-            benefits: [
-              "Promotes deep sleep",
-              "Non-habit forming",
-              "Reduces anxiety",
-            ],
-            active: true,
-            image: "",
-          },
-          {
-            id: "local-2",
-            name: "Vayu Sutra",
-            description:
-              "Instant relief from bloating, flatulence, and abdominal gas.",
-            packs: [{ price: 399, weight: 100 }],
-            ingredients: [
-              "Ajwain",
-              "Jeera",
-              "Hing",
-              "Dry Ginger",
-              "Black Salt",
-            ],
-            benefits: [
-              "Relieves bloating",
-              "Aids digestion",
-              "Combats acid reflux",
-            ],
-            active: true,
-            image: "",
-          },
-          {
-            id: "local-3",
-            name: "Gut Sutra",
-            description:
-              "Daily colon cleanse, detox, and digestive rejuvenator.",
-            packs: [{ price: 449, weight: 100 }],
-            ingredients: [
-              "Haritaki",
-              "Bibhitaki",
-              "Amalaki",
-              "Senna leaves",
-              "Fennel seeds",
-            ],
-            benefits: [
-              "Supports bowel health",
-              "Cleanses toxins",
-              "Improves absorption",
-            ],
-            active: true,
-            image: "",
-          },
-          {
-            id: "local-4",
-            name: "Cool Sutra",
-            description:
-              "Herbal cooling remedy for acidity, body heat, and ulcers.",
-            packs: [{ price: 429, weight: 100 }],
-            ingredients: [
-              "Shatavari",
-              "Mulethi",
-              "Fennel seeds",
-              "Coriander seeds",
-              "Praval Pishti",
-            ],
-            benefits: [
-              "Neutralizes acidity",
-              "Soothes ulcers",
-              "Balances body heat",
-            ],
-            active: true,
-            image: "",
-          },
-          {
-            id: "local-5",
-            name: "Pain Sutra",
-            description:
-              "Natural anti-inflammatory relief for joints and muscles.",
-            packs: [{ price: 479, weight: 100 }],
-            ingredients: [
-              "Shallaki",
-              "Guggulu",
-              "Nirgundi",
-              "Methi",
-              "Dry Ginger",
-            ],
-            benefits: [
-              "Reduces joint stiffness",
-              "Anti-inflammatory",
-              "Safe long-term",
-            ],
-            active: true,
-            image: "",
-          },
-          {
-            id: "local-6",
-            name: "Homoco Sutra",
-            description:
-              "Endocrine regulator for hormonal balance, thyroid, and stress.",
-            packs: [{ price: 499, weight: 100 }],
-            ingredients: [
-              "Kanchanar",
-              "Ashwagandha",
-              "Gokshura",
-              "Shatavari",
-              "Lodhra",
-            ],
-            benefits: [
-              "Balances hormones",
-              "Supports thyroid",
-              "Reduces fatigue",
-            ],
-            active: true,
-            image: "",
-          },
-        ]);
+        setProducts([]);
       } finally {
         setLoadingProducts(false);
       }
@@ -269,7 +143,7 @@ const App = () => {
             currentView={view}
             onViewToggle={setView}
           />
-          <Hero onOpenIngredients={() => setShowIngredientsModal(true)} />
+          <Hero />
 
           <DoctorBio
             onBookClick={() => {
@@ -338,10 +212,26 @@ const App = () => {
                     </div>
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
-                    Holistic Homeopathy, wild-crafted herbal formulations, and
+                    Holistic natural solution, wild-crafted herbal formulations, and
                     personalized lifestyle counseling by Dr. Keval Dankhara.
                     Treating the root cause, not just symptoms.
                   </p>
+                  
+                  {/* Social Media Links */}
+                  <div className="pt-4 flex items-center gap-3">
+                    <a href="https://youtube.com/@drkevaldakhara?si=YOZmJhqA3AesaRWf" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-red-500 hover:text-white transition-all shadow-md">
+                      <Youtube className="h-4 w-4" />
+                    </a>
+                    <a href="https://www.instagram.com/dr_keval_dankhara?igsh=b202a3FtZjJoZGt3&utm_source=qr" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-pink-600 hover:text-white transition-all shadow-md">
+                      <Instagram className="h-4 w-4" />
+                    </a>
+                    <a href="https://www.facebook.com/dankhrakeval?" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-md">
+                      <Facebook className="h-4 w-4" />
+                    </a>
+                    <a href="https://whatsapp.com/channel/0029VbBqXTdJpe8hgxrZCb2t" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-emerald-500 hover:text-white transition-all shadow-md" title="WhatsApp Channel">
+                      <MessageCircle className="h-4 w-4" />
+                    </a>
+                  </div>
                 </div>
 
                 <div>
@@ -392,8 +282,7 @@ const App = () => {
                     <li className="flex items-start gap-2.5">
                       <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                       <span>
-                        204 Royal Plaza, Yogi Chowk, Surat, Gujarat, India -
-                        395010
+                        Surat, Gujarat, India 
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
@@ -402,7 +291,7 @@ const App = () => {
                     </li>
                     <li className="flex items-center gap-2.5">
                       <Mail className="h-4 w-4 text-primary shrink-0" />
-                      <span>contact@sutraholistic.com</span>
+                      <span>drkevaldankhara@gmail.com</span>
                     </li>
                   </ul>
                 </div>
@@ -439,8 +328,8 @@ const App = () => {
                 </p>
                 <p className="max-w-2xl mx-auto">
                   Disclaimer: The formulas and lifestyle guidelines shared on
-                  this platform are formulated based on classical Ayurvedic and
-                  Homeopathic principles. Individual results may vary.
+                  this platform are formulated based on classical botanical blend and
+                  herbal formula principles. Individual results may vary.
                 </p>
               </div>
             </div>
@@ -454,66 +343,6 @@ const App = () => {
           onClose={() => setShowAdminLogin(false)}
           onLoginSuccess={handleLoginSuccess}
         />
-      )}
-
-      {/* Ingredients Modal */}
-      {showIngredientsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="relative w-full max-w-md bg-bg-cream rounded-3xl overflow-hidden shadow-2xl border border-primary/20 animate-fade-in text-left">
-            <div className="px-6 py-5 border-b border-primary/15 bg-white flex justify-between items-center">
-              <h3 className="font-serif text-lg font-bold text-text-dark">
-                Sleep Sutra Ingredients
-              </h3>
-              <button
-                onClick={() => setShowIngredientsModal(false)}
-                className="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center text-text-light hover:bg-slate-100"
-              >
-                ×
-              </button>
-            </div>
-            <div className="p-6 space-y-4 text-sm text-text-light">
-              <ul className="space-y-2 text-xs">
-                {[
-                  [
-                    "Tagara Root Extract",
-                    "Clinically researched to decrease sleep latency and calm brain activity.",
-                  ],
-                  [
-                    "Ashwagandha",
-                    "Decreases cortisol stress hormones to quieten the nervous system.",
-                  ],
-                  [
-                    "Jatamansi (Spikenard)",
-                    "Promotes cooling relaxation and relaxes hyper-active thinking loops.",
-                  ],
-                  [
-                    "Elaichi (Green Cardamom)",
-                    "Balances digestive Pitta to avoid middle-of-night waking.",
-                  ],
-                  [
-                    "Spelt & Organic Oats",
-                    "High in magnesium — triggers natural melatonin production.",
-                  ],
-                ].map(([name, desc]) => (
-                  <li key={name} className="flex gap-2">
-                    <span className="text-primary font-bold">✓</span>
-                    <span>
-                      <strong>{name}</strong> — {desc}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="pt-4 border-t border-primary/10 flex justify-end">
-                <button
-                  onClick={() => setShowIngredientsModal(false)}
-                  className="rounded-lg bg-text-dark text-white px-5 py-2.5 text-xs font-bold uppercase"
-                >
-                  Got It
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
 
       {/* WhatsApp floating button */}

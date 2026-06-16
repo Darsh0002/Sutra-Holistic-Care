@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { X, Lock, Mail, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
-import { loginAdmin } from '../services/authService.js';
+import React, { useState } from "react";
+import { X, Lock, Mail, ShieldCheck, AlertCircle, Loader2 } from "lucide-react";
+import { loginAdmin } from "../services/authService.js";
 
 const AdminLogin = ({ onClose, onLoginSuccess }) => {
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     try {
       const data = await loginAdmin(email, password);
       onLoginSuccess(data);
       onClose();
     } catch (err) {
-      setError(err.message || 'Invalid email or password. Please try again.');
+      setError(err.message || "Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -26,13 +26,12 @@ const AdminLogin = ({ onClose, onLoginSuccess }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
       <div className="relative w-full max-w-md bg-bg-cream rounded-3xl overflow-hidden shadow-2xl border border-primary/20 animate-fade-in">
-        
         {/* Header decoration bar */}
         <div className="h-2 w-full bg-linear-to-r from-primary via-primary-dark to-primary" />
 
         <div className="px-6 py-8 relative">
           {/* Close button */}
-          <button 
+          <button
             onClick={onClose}
             className="absolute top-6 right-6 h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center text-text-light hover:text-text-dark hover:bg-slate-100 transition-colors"
           >
@@ -62,7 +61,10 @@ const AdminLogin = ({ onClose, onLoginSuccess }) => {
           <form onSubmit={handleSubmit} className="space-y-4 text-left">
             {/* Email */}
             <div>
-              <label htmlFor="admin-email" className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1.5">
+              <label
+                htmlFor="admin-email"
+                className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1.5"
+              >
                 Email
               </label>
               <div className="relative">
@@ -83,7 +85,10 @@ const AdminLogin = ({ onClose, onLoginSuccess }) => {
 
             {/* Password */}
             <div>
-              <label htmlFor="admin-password" className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1.5">
+              <label
+                htmlFor="admin-password"
+                className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1.5"
+              >
                 Password
               </label>
               <div className="relative">
@@ -113,11 +118,10 @@ const AdminLogin = ({ onClose, onLoginSuccess }) => {
                   Signing In…
                 </>
               ) : (
-                'Sign In'
+                "Sign In"
               )}
             </button>
           </form>
-
         </div>
       </div>
     </div>

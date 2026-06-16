@@ -4,14 +4,14 @@ import { MessageCircle, Calendar, BookOpen, Sparkles, Shield, Heart, ChevronRigh
 // Rotating conditions the brand addresses
 const HEADLINES = [
   { problem: "Can't sleep?",         solution: "We heal your root cause.",  emoji: "🌙" },
-  { problem: "Chronic acidity?",     solution: "Ayurveda has the answer.",  emoji: "🔥" },
+  { problem: "Chronic acidity?",     solution: "Natural solution has the answer.",  emoji: "🔥" },
   { problem: "Joint pain daily?",    solution: "Nature relieves it gently.", emoji: "🦴" },
   { problem: "Hormonal imbalance?",  solution: "Balance from within.",       emoji: "⚖️" },
   { problem: "Bloating & gas?",      solution: "Your gut can heal.",         emoji: "💚" },
   { problem: "Low energy & stress?", solution: "Reclaim your vitality.",     emoji: "⚡" },
 ];
 
-const Hero = ({ onOpenIngredients }) => {
+const Hero = () => {
   const [current, setCurrent] = useState(0);
   const [fading, setFading] = useState(false);
 
@@ -65,7 +65,7 @@ const Hero = ({ onOpenIngredients }) => {
             {/* Brand promise */}
             <p className="mt-6 text-base text-text-light sm:text-lg leading-relaxed max-w-xl">
               <strong className="text-text-dark">Sutra Holistic Care</strong> — founded by Dr. Keval Dankhara — blends
-              classical Ayurveda, Homeopathy &amp; lifestyle medicine to treat the <em>root cause</em>, not just symptoms.
+              classical herbal medicines, botanical blend &amp; lifestyle medicine to treat the <em>root cause</em>, not just symptoms.
             </p>
 
             {/* Dot indicators for headline */}
@@ -114,22 +114,10 @@ const Hero = ({ onOpenIngredients }) => {
               </a>
             </div>
 
-            {/* Track order link */}
-            <div className="mt-4 flex sm:justify-center lg:justify-start">
-              <a
-                href="https://trackcourier.io/anjani-courier-tracking"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/70 hover:bg-white hover:border-indigo-400 text-indigo-700 px-4 py-1.5 text-xs font-semibold tracking-wider uppercase shadow-sm transition-all duration-300 hover:-translate-y-0.5"
-              >
-                <Truck className="h-3.5 w-3.5" /> Track Your Order
-              </a>
-            </div>
-
             {/* Trust badges */}
             <div className="mt-10 grid grid-cols-3 gap-3 border-t border-primary/20 pt-8 max-w-lg sm:mx-auto lg:mx-0">
               {[
-                { icon: Shield,   text: '100% Ayurvedic' },
+                { icon: Shield,   text: '100% Plant-based solution' },
                 { icon: Sparkles, text: 'No Chemicals'    },
                 { icon: Heart,    text: 'Doctor Crafted'  },
               ].map(({ icon: Icon, text }) => (
@@ -159,10 +147,10 @@ const Hero = ({ onOpenIngredients }) => {
                     Sutra Holistic Care
                   </span>
                   <h3 className="mt-3 font-serif text-xl font-extrabold text-text-dark leading-snug">
-                    One clinic.<br />All-natural<br />Ayurvedic solutions.
+                    One clinic.<br />All-natural<br />Herbal support.
                   </h3>
                   <p className="mt-2 text-xs text-text-light leading-relaxed">
-                    Dr. Keval Dankhara, BHMS — since 2018.
+                    Dr. Keval Dankhara, BHMS — since 2024.
                   </p>
                 </div>
 

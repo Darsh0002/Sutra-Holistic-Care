@@ -27,7 +27,7 @@ import { isAdminLoggedIn, logoutAdmin } from "./services/authService.js";
 const App = () => {
   // ── Derive initial view from URL (/admin → admin, anything else → patient)
   const getViewFromPath = () =>
-    window.location.pathname === '/admin' ? 'admin' : 'patient';
+    window.location.pathname === "/admin" ? "admin" : "patient";
 
   const [view, setView] = useState(getViewFromPath);
   const [products, setProducts] = useState([]);
@@ -38,9 +38,9 @@ const App = () => {
   // ── Navigate helper – updates state AND browser URL ─────────────────────────
   const navigateTo = (newView) => {
     setView(newView);
-    const path = newView === 'admin' ? '/admin' : '/';
+    const path = newView === "admin" ? "/admin" : "/";
     if (window.location.pathname !== path) {
-      window.history.pushState({ view: newView }, '', path);
+      window.history.pushState({ view: newView }, "", path);
     }
   };
 
@@ -51,14 +51,14 @@ const App = () => {
     const currentPath = window.location.pathname;
 
     // If the page was opened at /admin but the user isn't logged in, show login modal
-    if (currentPath === '/admin' && !isAdminLoggedIn()) {
-      setView('patient');
-      window.history.replaceState({ view: 'patient' }, '', '/');
+    if (currentPath === "/admin" && !isAdminLoggedIn()) {
+      setView("patient");
+      window.history.replaceState({ view: "patient" }, "", "/");
       setShowAdminLogin(true);
-    } else if (currentPath !== '/admin' && currentPath !== '/') {
+    } else if (currentPath !== "/admin" && currentPath !== "/") {
       // Redirect any invalid path to home
-      setView('patient');
-      window.history.replaceState({ view: 'patient' }, '', '/');
+      setView("patient");
+      window.history.replaceState({ view: "patient" }, "", "/");
     }
 
     // Handle browser back / forward
@@ -66,9 +66,9 @@ const App = () => {
       const v = e.state?.view ?? getViewFromPath();
       setView(v);
     };
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -111,18 +111,18 @@ const App = () => {
 
   const handleLoginSuccess = () => {
     setAdminLoggedIn(true);
-    navigateTo('admin');
+    navigateTo("admin");
   };
 
   const handleLogout = () => {
     logoutAdmin();
     setAdminLoggedIn(false);
-    navigateTo('patient');
+    navigateTo("patient");
   };
 
   const handleAdminToggle = () => {
     if (isAdminLoggedIn()) {
-      navigateTo('admin');
+      navigateTo("admin");
     } else {
       setShowAdminLogin(true);
     }
@@ -212,23 +212,44 @@ const App = () => {
                     </div>
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
-                    Holistic natural solution, wild-crafted herbal formulations, and
-                    personalized lifestyle counseling by Dr. Keval Dankhara.
+                    Holistic natural solution, wild-crafted herbal formulations,
+                    and personalized lifestyle counseling by Dr. Keval Dankhara.
                     Treating the root cause, not just symptoms.
                   </p>
-                  
+
                   {/* Social Media Links */}
                   <div className="pt-4 flex items-center gap-3">
-                    <a href="https://youtube.com/@drkevaldakhara?si=YOZmJhqA3AesaRWf" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-red-500 hover:text-white transition-all shadow-md">
+                    <a
+                      href="https://youtube.com/@drkevaldakhara?si=YOZmJhqA3AesaRWf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-red-500 hover:text-white transition-all shadow-md"
+                    >
                       <Youtube className="h-4 w-4" />
                     </a>
-                    <a href="https://www.instagram.com/dr_keval_dankhara?igsh=b202a3FtZjJoZGt3&utm_source=qr" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-pink-600 hover:text-white transition-all shadow-md">
+                    <a
+                      href="https://www.instagram.com/dr_keval_dankhara?igsh=b202a3FtZjJoZGt3&utm_source=qr"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-pink-600 hover:text-white transition-all shadow-md"
+                    >
                       <Instagram className="h-4 w-4" />
                     </a>
-                    <a href="https://www.facebook.com/dankhrakeval?" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-md">
+                    <a
+                      href="https://www.facebook.com/dankhrakeval?"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-blue-600 hover:text-white transition-all shadow-md"
+                    >
                       <Facebook className="h-4 w-4" />
                     </a>
-                    <a href="https://whatsapp.com/channel/0029VbBqXTdJpe8hgxrZCb2t" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-emerald-500 hover:text-white transition-all shadow-md" title="WhatsApp Channel">
+                    <a
+                      href="https://whatsapp.com/channel/0029VbBqXTdJpe8hgxrZCb2t"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-emerald-500 hover:text-white transition-all shadow-md"
+                      title="WhatsApp Channel"
+                    >
                       <MessageCircle className="h-4 w-4" />
                     </a>
                   </div>
@@ -281,9 +302,7 @@ const App = () => {
                   <ul className="space-y-2.5 text-xs text-slate-400">
                     <li className="flex items-start gap-2.5">
                       <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                      <span>
-                        Surat, Gujarat, India 
-                      </span>
+                      <span>Surat, Gujarat, India</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <Phone className="h-4 w-4 text-primary shrink-0" />
@@ -328,8 +347,9 @@ const App = () => {
                 </p>
                 <p className="max-w-2xl mx-auto">
                   Disclaimer: The formulas and lifestyle guidelines shared on
-                  this platform are formulated based on classical botanical blend and
-                  herbal formula principles. Individual results may vary.
+                  this platform are formulated based on classical botanical
+                  blend and herbal formula principles. Individual results may
+                  vary.
                 </p>
               </div>
             </div>

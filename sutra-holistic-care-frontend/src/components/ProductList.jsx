@@ -12,62 +12,7 @@ import {
   openRazorpayCheckout,
 } from '../services/orderService.js';
 
-// ─── Static product detail lookup (fallback when API product has no extras) ──
-const PRODUCT_DETAILS = {
-  'Sleep Sutra Powder': {
-    tagline: 'Premium Ayurvedic sleep powder with zero dependency.',
-    description: 'Sleep Sutra is a hand-formulated blend designed to naturally calm the nervous system, decrease sleep latency, and improve REM cycles without the morning grogginess associated with sleeping pills.',
-    ingredients: ['Premium Cardamom', 'Organic Rolled Oats', 'Ashwagandha Extract', 'Jatamansi', 'Tagara Root'],
-    benefits: ['Promotes deep, restorative sleep', 'Reduces anxiety and mind chatter', 'Non-habit forming formulation', 'Improves next-day morning energy'],
-    usage: 'Mix 1 teaspoon in a glass of warm milk or water 30 minutes before bed. Drink slowly.',
-  },
-  'Vayu Sutra': {
-    tagline: 'Instant relief from bloating, flatulence, and abdominal gas.',
-    description: 'Vayu Sutra focuses on correcting the vata imbalance in the digestive tract, aiding enzyme secretion, and easing bowel contractions to immediately relieve pressure and discomfort.',
-    ingredients: ['Ajwain (Carom seeds)', 'Jeera (Cumin)', 'Hing (Asafoetida)', 'Suni/Dry Ginger', 'Black Salt'],
-    benefits: ['Relieves bloating within 15 minutes', 'Assists digestion after heavy meals', 'Combats acid reflux and burping', 'Soothes gut lining irritation'],
-    usage: 'Take 1/2 teaspoon with warm water after lunch and dinner, or as needed when bloated.',
-  },
-  'Gut Sutra': {
-    tagline: 'Daily colon cleanse, detox, and digestive rejuvenator.',
-    description: 'Gut Sutra is a premium formula developed to naturally cleanse accumulated toxins (ama) from the colon, normalize peristalsis, and improve gut flora health for long-term immunity.',
-    ingredients: ['Haritaki', 'Bibhitaki', 'Amalaki (Triphala Grade-A)', 'Senna leaves (low dose)', 'Fennel seed extracts'],
-    benefits: ['Supports regular bowel movements', 'Cleanses deep intestinal toxins', 'Improves skin health via detox', 'Enhances nutrient absorption rate'],
-    usage: 'Take 1 teaspoon with lukewarm water right before bedtime. Best taken on an empty stomach.',
-  },
-  'Cool Sutra': {
-    tagline: 'Herbal cooling remedy for acidity, body heat, and ulcers.',
-    description: 'Cool Sutra is a pitta-balancing cooling powder designed to treat chronic heartburn, mouth ulcers, burning hands and feet, and heat-induced skin rashes.',
-    ingredients: ['Shatavari root', 'Mulethi (Licorice)', 'Fennel seeds', 'Coriander seeds', 'Praval Pishti (Coral calcium)'],
-    benefits: ['Neutralizes excess stomach acid immediately', 'Soothes mouth and stomach ulcers', 'Balances internal core temperature', 'Controls heat rashes and acne'],
-    usage: 'Take 1/2 teaspoon mixed in cold water 15 minutes before meals.',
-  },
-  'Pain Sutra': {
-    tagline: 'Natural anti-inflammatory relief for joints and muscles.',
-    description: 'Pain Sutra is a highly potent analgesic herb mix that reduces uric acid, lubricates stiff joints, and reduces muscle inflammation naturally without causing stomach lining acidity.',
-    ingredients: ['Shallaki (Boswellia)', 'Guggulu extract', 'Nirgundi leaves', 'Methi (Fenugreek)', 'Dry Ginger root'],
-    benefits: ['Reduces joint stiffness and swelling', 'Helps relieve lower back and knee pain', 'Balances joint lubrication fluids', 'Safe for long-term arthritic support'],
-    usage: 'Take 1/2 teaspoon twice daily after meals with lukewarm water.',
-  },
-  'Homoco Sutra': {
-    tagline: 'Endocrine regulator for hormonal balance, thyroid, and stress.',
-    description: 'Homoco Sutra is formulated to support stress management and regulate endocrine gland secretions. It assists in optimizing metabolism, energy levels, and hormonal cycles.',
-    ingredients: ['Kanchanar bark', 'Ashwagandha root', 'Gokshura fruit', 'Shatavari', 'Lodhra bark'],
-    benefits: ['Balances menstrual cycles and eases cramps', 'Supports thyroid and ovarian health', 'Reduces chronic fatigue and brain fog', 'Balances stress hormones (cortisol)'],
-    usage: 'Take 1 teaspoon twice daily: once in the morning before breakfast, and once in the evening.',
-  },
-};
 
-const getDetails = (product) => {
-  const staticDetails = PRODUCT_DETAILS[product.name] || {};
-  return {
-    tagline:     staticDetails.tagline     || product.description || 'Doctor-formulated holistic blend.',
-    description: staticDetails.description || product.description || 'Crafted with premium organic herbs.',
-    ingredients: (product.ingredients && product.ingredients.length > 0) ? product.ingredients : (staticDetails.ingredients || []),
-    benefits:    (product.benefits    && product.benefits.length    > 0) ? product.benefits    : (staticDetails.benefits    || []),
-    usage:       staticDetails.usage || 'Consult Dr. Keval Dankhara for personalized dosage instructions.',
-  };
-};
 
 // ─── Buy checkout states ───────────────────────────────────────────────────
 const CHECKOUT_STEP = { FORM: 'form', PROCESSING: 'processing', SUCCESS: 'success', ERROR: 'error' };
@@ -191,7 +136,7 @@ const ProductList = ({ products, onProductInquiry }) => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold tracking-widest text-primary-dark font-sans uppercase">DOCTOR FORMULATED</span>
           <h2 className="mt-3 font-serif text-4xl font-extrabold tracking-tight text-text-dark sm:text-5xl">
-            Ayurvedic Sutra Products
+            Blend Sutra Products
           </h2>
           <p className="mt-4 text-base text-text-light max-w-xl mx-auto">
             Handcrafted in small batches by Dr. Keval Dankhara. Made from 100% wild-harvested herbs, 
@@ -202,7 +147,6 @@ const ProductList = ({ products, onProductInquiry }) => {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product) => {
-            const details = getDetails(product);
             const firstPack = product.packs?.[0];
             const displayPrice = firstPack?.price || product.price || 0;
             const isAvailable = product.active !== false && product.inStock !== false;
@@ -247,7 +191,7 @@ const ProductList = ({ products, onProductInquiry }) => {
                     Radhe Clinic Special
                   </p>
                   <p className="mt-3 text-sm text-text-light line-clamp-2 leading-relaxed">
-                    {details.tagline}
+                    {product.description || 'Doctor-formulated holistic blend.'}
                   </p>
 
                   {/* Pack size chips */}
@@ -277,7 +221,7 @@ const ProductList = ({ products, onProductInquiry }) => {
                   <div className="flex gap-2">
                     {/* Detail eye button */}
                     <button
-                      onClick={() => setSelectedProduct({ ...product, ...details })}
+                      onClick={() => setSelectedProduct(product)}
                       className="inline-flex items-center justify-center h-10 w-10 rounded-lg border border-primary/30 text-text-dark hover:border-primary-dark hover:text-primary-dark transition-colors"
                       title="View Details"
                     >
@@ -327,7 +271,7 @@ const ProductList = ({ products, onProductInquiry }) => {
 
               <div>
                 <h4 className="text-xs font-bold tracking-wider text-text-dark uppercase font-sans mb-2">Description</h4>
-                <p className="text-sm text-text-light leading-relaxed">{selectedProduct.description}</p>
+                <p className="text-sm text-text-light leading-relaxed">{selectedProduct.description || 'Crafted with premium organic herbs.'}</p>
               </div>
 
               {/* Ingredients */}
@@ -366,7 +310,7 @@ const ProductList = ({ products, onProductInquiry }) => {
                 <HelpCircle className="h-5 w-5 text-primary-dark shrink-0 mt-0.5" />
                 <div>
                   <h5 className="text-xs font-bold text-text-dark font-sans uppercase">Dosage &amp; Usage Instructions</h5>
-                  <p className="text-xs text-text-light mt-1 leading-relaxed">{selectedProduct.usage}</p>
+                  <p className="text-xs text-text-light mt-1 leading-relaxed">{selectedProduct.usage || 'Consult Dr. Keval Dankhara for personalized dosage instructions.'}</p>
                 </div>
               </div>
             </div>

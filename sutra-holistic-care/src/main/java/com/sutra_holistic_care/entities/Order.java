@@ -38,7 +38,10 @@ public class Order {
 
     private String paymentId;
 
+    /** Courier tracking ID added by admin after shipment */
+    private String trackingId;
+
     public enum OrderStatus {
         PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
     }
-}
+}

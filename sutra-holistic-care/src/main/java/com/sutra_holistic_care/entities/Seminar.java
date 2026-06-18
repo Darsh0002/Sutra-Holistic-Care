@@ -27,6 +27,8 @@ public class Seminar {
 
     private String language;
 
+    private String seminarLink; // Google Meet / Zoom / YouTube link for the webinar
+
     private Integer totalSeats;
 
     private Integer bookedSeats;

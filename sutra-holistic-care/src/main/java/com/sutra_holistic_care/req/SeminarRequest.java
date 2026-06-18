@@ -20,5 +20,7 @@ public class SeminarRequest {
 
     private String language;
 
+    private String seminarLink;
+
     private Integer totalSeats;
 }

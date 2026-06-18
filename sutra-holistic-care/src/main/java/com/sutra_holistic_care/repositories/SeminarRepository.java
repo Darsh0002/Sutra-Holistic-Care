@@ -9,4 +9,5 @@ public interface SeminarRepository extends MongoRepository<Seminar, String> {
     List<Seminar> findByActiveTrueOrderByDateAsc();
     List<Seminar> findByDateAfterAndActiveTrueOrderByDateAsc(LocalDate date);
     List<Seminar> findAllByOrderByDateAsc();
-}
+    List<Seminar> findByActiveTrueAndDateBefore(LocalDate date);
+}

@@ -12,7 +12,7 @@ public class ProductRequest {
 
     private String description;
 
-    private String emoji;
+    private String image;
 
     // "At least one pack is required"
     private List<Pack> packs = new ArrayList<>();
@@ -20,4 +20,6 @@ public class ProductRequest {
     private List<String> ingredients = new ArrayList<>();
 
     private List<String> benefits = new ArrayList<>();
+
+    private Boolean active;
 }

@@ -21,7 +21,7 @@ public class Product {
 
     private String description;
 
-    private String emoji;
+    private String image;
 
     @Builder.Default
     private List<Pack> packs = new ArrayList<>();

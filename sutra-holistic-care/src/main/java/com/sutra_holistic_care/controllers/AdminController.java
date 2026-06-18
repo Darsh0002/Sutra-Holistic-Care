@@ -52,6 +52,14 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("Order status updated", order));
     }
 
+    @PutMapping("/orders/{id}/tracking")
+    public ResponseEntity<ApiResponse<Order>> addTrackingInfo(
+            @PathVariable String id,
+            @RequestParam String trackingId) {
+        Order order = orderService.addTrackingInfo(id, trackingId);
+        return ResponseEntity.ok(ApiResponse.success("Tracking info saved", order));
+    }
+
     // ─── Consultations ──────────────────────────────────────────
 
     @GetMapping("/consultations")

@@ -2,10 +2,10 @@ package com.sutra_holistic_care.services;
 
 import com.sutra_holistic_care.req.ConsultationRequest;
 import com.sutra_holistic_care.entities.Consultation;
-import com.sutra_holistic_care.exceptions.BusinessException;
 import com.sutra_holistic_care.exceptions.ResourceNotFoundException;
 import com.sutra_holistic_care.repositories.ConsultationRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,27 +15,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ConsultationService {
 
     private final ConsultationRepository consultationRepository;
 
+    private final SubscriberService subscriberService;
+
     @Value("${app.consultation.fee}")
     private Long consultationFee;
 
+    // Morning: 9 AM – 1 PM  |  Evening: 4 PM – 8 PM
     private static final List<LocalTime> ALL_SLOTS = List.of(
-            LocalTime.of(9, 0), LocalTime.of(10, 0), LocalTime.of(11, 0),
-            LocalTime.of(12, 0), LocalTime.of(14, 0), LocalTime.of(15, 0),
-            LocalTime.of(16, 0), LocalTime.of(17, 0)
+            LocalTime.of(9, 0),  LocalTime.of(10, 0), LocalTime.of(11, 0), LocalTime.of(12, 0),
+            LocalTime.of(16, 0), LocalTime.of(17, 0), LocalTime.of(18, 0), LocalTime.of(19, 0)
     );
 
     public Consultation bookConsultation(ConsultationRequest request) {
-        boolean slotTaken = consultationRepository
-                .existsByConsultationDateAndTimeSlot(request.getConsultationDate(), request.getTimeSlot());
-        if (slotTaken) {
-            throw new BusinessException("This time slot is already booked. Please choose another.");
-        }
 
         Consultation consultation = Consultation.builder()
                 .patientName(request.getPatientName())
@@ -51,7 +49,12 @@ public class ConsultationService {
                 .bookedAt(LocalDateTime.now())
                 .build();
 
-        return consultationRepository.save(consultation);
+        Consultation saved = consultationRepository.save(consultation);
+
+        // Capture subscriber for marketing CRM (captured on booking, not payment)
+        subscriberService.upsertFromConsultation(saved);
+
+        return saved;
     }
 
     public Consultation getConsultation(String id) {

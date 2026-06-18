@@ -18,6 +18,7 @@ public class RegistrationService {
 
     private final RegistrationRepository registrationRepository;
     private final SeminarService seminarService;
+    private final SubscriberService subscriberService;
 
     public Registration createRegistration(RegistrationRequest request) {
         Seminar seminar = seminarService.getSeminar(request.getSeminarId());
@@ -29,7 +30,7 @@ public class RegistrationService {
             throw new BusinessException("No seats available for this seminar");
         }
         if (registrationRepository.existsByMobileAndSeminarId(request.getMobile(), request.getSeminarId())) {
-            throw new BusinessException("You are already registered for this seminar");
+            throw new BusinessException("Mobile Number already registered for this seminar");
         }
 
         Registration registration = Registration.builder()
@@ -40,12 +41,15 @@ public class RegistrationService {
                 .email(request.getEmail())
                 .seminarId(seminar.getId())
                 .seminarTopic(seminar.getTopic())
-                .feePaid(seminar.getFee())
-                .status(Registration.RegistrationStatus.PENDING_PAYMENT)
+                .feePaid(0L) // Seminars are always free
+                .status(Registration.RegistrationStatus.CONFIRMED) // Auto-confirm — no payment needed
                 .registeredAt(LocalDateTime.now())
                 .build();
 
-        return registrationRepository.save(registration);
+        Registration saved = registrationRepository.save(registration);
+        seminarService.incrementBookedSeats(seminar.getId()); // Claim seat immediately
+        subscriberService.upsertFromRegistration(saved);       // Add to CRM
+        return saved;
     }
 
     public Registration getRegistration(String id) {
@@ -71,6 +75,8 @@ public class RegistrationService {
         reg.setPaymentId(paymentId);
         registrationRepository.save(reg);
         seminarService.incrementBookedSeats(reg.getSeminarId());
+        // Capture subscriber for marketing CRM
+        subscriberService.upsertFromRegistration(reg);
     }
 
     public void cancelRegistration(String id) {

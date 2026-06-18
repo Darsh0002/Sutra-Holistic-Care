@@ -19,11 +19,11 @@ public class ProductService {
         Product product = Product.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .emoji(request.getEmoji() != null ? request.getEmoji() : "🌿")
+                .image(request.getImage())
                 .packs(request.getPacks())
                 .ingredients(request.getIngredients())
                 .benefits(request.getBenefits())
-                .active(true)
+                .active(request.getActive() != null ? request.getActive() : true)
                 .build();
         return productRepository.save(product);
     }
@@ -32,10 +32,11 @@ public class ProductService {
         Product product = getProduct(id);
         product.setName(request.getName());
         product.setDescription(request.getDescription());
-        if (request.getEmoji() != null) product.setEmoji(request.getEmoji());
+        if (request.getImage() != null) product.setImage(request.getImage());
         product.setPacks(request.getPacks());
         product.setIngredients(request.getIngredients());
         product.setBenefits(request.getBenefits());
+        if (request.getActive() != null) product.setActive(request.getActive());
         return productRepository.save(product);
     }
 

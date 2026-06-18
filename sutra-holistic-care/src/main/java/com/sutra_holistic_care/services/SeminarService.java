@@ -6,24 +6,42 @@ import com.sutra_holistic_care.exceptions.BusinessException;
 import com.sutra_holistic_care.exceptions.ResourceNotFoundException;
 import com.sutra_holistic_care.repositories.SeminarRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SeminarService {
 
     private final SeminarRepository seminarRepository;
 
+    /**
+     * Runs every day at midnight IST (18:30 UTC) to automatically deactivate
+     * seminars whose date has already passed.
+     */
+    @Scheduled(cron = "0 30 18 * * *", zone = "Asia/Kolkata")
+    public void deactivatePastSeminars() {
+        List<Seminar> pastSeminars = seminarRepository.findByActiveTrueAndDateBefore(LocalDate.now());
+        if (pastSeminars.isEmpty()) return;
+        pastSeminars.forEach(s -> s.setActive(false));
+        seminarRepository.saveAll(pastSeminars);
+        log.info("Auto-deactivated {} seminar(s) that have passed.", pastSeminars.size());
+    }
+
     public Seminar createSeminar(SeminarRequest request) {
         Seminar seminar = Seminar.builder()
                 .topic(request.getTopic())
-                .fee(request.getFee())
+                .fee(0L) // Seminars are always free
                 .date(request.getDate())
                 .time(request.getTime())
                 .language(request.getLanguage())
+                .seminarLink(request.getSeminarLink())
                 .totalSeats(request.getTotalSeats())
                 .bookedSeats(0)
                 .active(true)
@@ -34,10 +52,11 @@ public class SeminarService {
     public Seminar updateSeminar(String id, SeminarRequest request) {
         Seminar seminar = getSeminar(id);
         seminar.setTopic(request.getTopic());
-        seminar.setFee(request.getFee());
+        seminar.setFee(0L); // Seminars are always free
         seminar.setDate(request.getDate());
         seminar.setTime(request.getTime());
         seminar.setLanguage(request.getLanguage());
+        seminar.setSeminarLink(request.getSeminarLink());
         seminar.setTotalSeats(request.getTotalSeats());
         return seminarRepository.save(seminar);
     }

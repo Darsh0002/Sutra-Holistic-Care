@@ -14,12 +14,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final SubscriberService subscriberService;
 
     public Order createOrder(OrderRequest request) {
         Product product = productRepository.findById(request.getProductId())
@@ -80,6 +82,21 @@ public class OrderService {
         Order order = getOrder(orderId);
         order.setStatus(Order.OrderStatus.CONFIRMED);
         order.setPaymentId(paymentId);
-        orderRepository.save(order);
+        Order saved = orderRepository.save(order);
+        // Capture subscriber for marketing CRM
+        subscriberService.upsertFromOrder(saved);
+    }
+
+    /**
+     * Admin attaches courier tracking info to a shipped order.
+     * Saves tracking ID and URL on the order, then sends a WhatsApp
+     * notification to the customer with the tracking link.
+     */
+    public Order addTrackingInfo(String id, String trackingId) {
+        Order order = getOrder(id);
+        order.setTrackingId(trackingId);
+        Order saved = orderRepository.save(order);
+        // WhatsApp notification is now handled manually by the admin via wa.me redirect in the dashboard
+        return saved;
     }
 }

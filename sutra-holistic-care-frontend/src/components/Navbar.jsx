@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Menu,
   X,
@@ -41,9 +42,9 @@ const Navbar = ({ onAdminLoginClick, currentView, onViewToggle }) => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={(e) => handleLinkClick(e, "#hero")}
+          <Link
+            to="/"
+            className="flex items-center gap-2"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-primary-dark">
               <Activity className="h-5 w-5" />
@@ -56,7 +57,7 @@ const Navbar = ({ onAdminLoginClick, currentView, onViewToggle }) => {
                 Holistic Care
               </span>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">

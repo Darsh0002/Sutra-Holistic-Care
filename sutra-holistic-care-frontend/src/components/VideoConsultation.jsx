@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Video, Calendar, Clock, User, Phone, Mail, FileText, CheckCircle, ArrowRight, ShieldCheck, AlertCircle, Loader2, Sun, Sunset } from 'lucide-react';
-import { bookConsultation } from '../services/consultationService.js';
+import { bookConsultation, cancelConsultation } from '../services/consultationService.js';
 import { loadRazorpayScript, openRazorpayCheckout, verifyPayment } from '../services/orderService.js';
 import { api } from '../services/api.js';
 
@@ -153,6 +153,12 @@ const VideoConsultation = ({ onBook }) => {
       }
       setSubmitted(true);
     } catch (err) {
+      // If booking was created but payment was cancelled/failed, clean it up from DB
+      // so it doesn't appear as a ghost entry in the admin dashboard.
+      if (bookingId) {
+        cancelConsultation(bookingId).catch(() => {/* best-effort */});
+        setBookingId(null);
+      }
       setError(err.message || 'Unable to complete booking. Please try again.');
     } finally {
       setLoading(false);

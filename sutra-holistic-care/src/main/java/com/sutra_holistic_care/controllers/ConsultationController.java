@@ -43,4 +43,15 @@ public class ConsultationController {
         List<String> slots = consultationService.getAvailableSlots(date);
         return ResponseEntity.ok(ApiResponse.success(slots));
     }
+
+    /**
+     * Cancel an unpaid consultation — called by the frontend when the user
+     * dismisses or fails the Razorpay payment modal.
+     * Only deletes the record if it is still in PENDING status (never paid).
+     */
+    @DeleteMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<Void>> cancelConsultation(@PathVariable String id) {
+        consultationService.cancelUnpaidConsultation(id);
+        return ResponseEntity.ok(ApiResponse.success("Consultation cancelled", null));
+    }
 }

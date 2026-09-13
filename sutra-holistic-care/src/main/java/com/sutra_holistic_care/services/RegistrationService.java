@@ -33,6 +33,10 @@ public class RegistrationService {
             throw new BusinessException("Mobile Number already registered for this seminar");
         }
 
+        // Fee is set per-seminar by the admin; 0 means free
+        long fee = seminar.getFee() != null ? seminar.getFee() : 0L;
+        boolean isPaid = fee > 0;
+
         Registration registration = Registration.builder()
                 .name(request.getName())
                 .age(request.getAge())
@@ -41,14 +45,20 @@ public class RegistrationService {
                 .email(request.getEmail())
                 .seminarId(seminar.getId())
                 .seminarTopic(seminar.getTopic())
-                .feePaid(0L) // Seminars are always free
-                .status(Registration.RegistrationStatus.CONFIRMED) // Auto-confirm — no payment needed
+                .feePaid(fee)
+                .status(isPaid
+                        ? Registration.RegistrationStatus.PENDING_PAYMENT
+                        : Registration.RegistrationStatus.CONFIRMED)
                 .registeredAt(LocalDateTime.now())
                 .build();
 
         Registration saved = registrationRepository.save(registration);
-        seminarService.incrementBookedSeats(seminar.getId()); // Claim seat immediately
-        subscriberService.upsertFromRegistration(saved);       // Add to CRM
+
+        if (!isPaid) {
+            // Free seminar: claim seat and add to CRM immediately
+            seminarService.incrementBookedSeats(seminar.getId());
+            subscriberService.upsertFromRegistration(saved);
+        }
         return saved;
     }
 
@@ -87,4 +97,17 @@ public class RegistrationService {
         reg.setStatus(Registration.RegistrationStatus.CANCELLED);
         registrationRepository.save(reg);
     }
-}
+
+    /**
+     * Called when the user cancels or fails the Razorpay payment modal.
+     * Only deletes the registration if it is still PENDING_PAYMENT (never paid).
+     * Does NOT release a seat since it was never claimed for paid registrations.
+     */
+    public void cancelUnpaidRegistration(String id) {
+        registrationRepository.findById(id).ifPresent(reg -> {
+            if (reg.getStatus() == Registration.RegistrationStatus.PENDING_PAYMENT) {
+                registrationRepository.delete(reg);
+            }
+        });
+    }
+}

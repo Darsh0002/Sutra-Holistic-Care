@@ -19,6 +19,13 @@ export const registerForSeminar = (registrationRequest) =>
   api.post('/user/registrations', registrationRequest);
 
 /**
+ * Cancel an unpaid registration — call this if the user dismisses or fails payment.
+ * The backend only deletes it if it's still PENDING_PAYMENT.
+ */
+export const cancelRegistration = (id) =>
+  api.delete(`/user/registrations/${id}/cancel`);
+
+/**
  * Create Razorpay payment order for a seminar registration
  * Returns PaymentOrderResponse: { razorpayOrderId, referenceId, amount (paise), currency, keyId, description }
  */

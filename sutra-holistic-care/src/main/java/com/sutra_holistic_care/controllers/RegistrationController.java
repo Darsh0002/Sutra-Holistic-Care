@@ -34,4 +34,15 @@ public class RegistrationController {
         List<Registration> registrations = registrationService.getRegistrationsByMobile(mobile);
         return ResponseEntity.ok(ApiResponse.success(registrations));
     }
+
+    /**
+     * Cancel an unpaid registration — called by the frontend when the user
+     * dismisses or fails the Razorpay payment modal.
+     * Only deletes if status is still PENDING_PAYMENT.
+     */
+    @DeleteMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<Void>> cancelRegistration(@PathVariable String id) {
+        registrationService.cancelUnpaidRegistration(id);
+        return ResponseEntity.ok(ApiResponse.success("Registration cancelled", null));
+    }
 }

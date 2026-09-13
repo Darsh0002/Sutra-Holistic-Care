@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import {
   createOrder,
+  cancelOrder,
   createOrderPayment,
   verifyPayment,
   loadRazorpayScript,
@@ -107,15 +108,16 @@ const ProductList = ({ products, onProductInquiry }) => {
         setCheckoutStep(CHECKOUT_STEP.SUCCESS);
       }
     } catch (err) {
-      if (err.message === 'Payment cancelled by user.') {
-        // Order exists but not paid — show WhatsApp option
-        setCompletedOrder({ ...createdOrder, paymentStatus: 'cancelled' });
-        setCheckoutStep(CHECKOUT_STEP.SUCCESS);
-      } else {
-        // Still show success for order; payment can be done via WhatsApp
-        setCompletedOrder({ ...createdOrder, paymentStatus: 'whatsapp' });
-        setCheckoutStep(CHECKOUT_STEP.SUCCESS);
+      // Payment was cancelled or failed — clean up the pending order from DB
+      // so it doesn't appear as a ghost entry in the admin dashboard.
+      if (createdOrder?.id) {
+        cancelOrder(createdOrder.id).catch(() => {/* best-effort */});
       }
+      const msg = err.message === 'Payment cancelled by user.'
+        ? 'Payment was cancelled. Please try again.'
+        : err.message || 'Payment failed. Please try again.';
+      setCheckoutError(msg);
+      setCheckoutStep(CHECKOUT_STEP.ERROR);
     }
   };
 

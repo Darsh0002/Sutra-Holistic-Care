@@ -9,6 +9,14 @@ export const createOrder = (orderRequest) =>
   api.post('/user/orders', orderRequest);
 
 /**
+ * Cancel an unpaid order — call this if the user dismisses or fails payment.
+ * The backend only deletes it if it's still PENDING, so this is safe to call.
+ */
+export const cancelOrder = (id) =>
+  api.delete(`/user/orders/${id}/cancel`);
+
+
+/**
  * Get order by id (public)
  */
 export const getOrder = (id) => api.get(`/user/orders/${id}`);

@@ -55,7 +55,7 @@ public class PaymentService {
     public PaymentOrderResponse createConsultationPayment(String consultationId) {
         Consultation c = consultationService.getConsultation(consultationId);
         return createRazorpayOrder(c.getFee(), consultationId,
-                "Consultation with Dr. Ananya Vaid",
+                "Consultation with Dr. Keval Dankhara | Madhav Clinic",
                 Payment.PaymentType.CONSULTATION);
     }
 

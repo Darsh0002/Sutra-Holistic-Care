@@ -76,6 +76,12 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("Tracking info saved", order));
     }
 
+    @PostMapping("/orders")
+    public ResponseEntity<ApiResponse<Order>> createAdminOrder(@RequestBody AdminOrderRequest request) {
+        Order order = orderService.createAdminOrder(request);
+        return ResponseEntity.ok(ApiResponse.success("Order added successfully", order));
+    }
+
     // ─── Consultations ──────────────────────────────────────────
 
     @GetMapping("/consultations")

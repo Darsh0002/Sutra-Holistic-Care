@@ -1,10 +1,16 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Calendar, Clock, Video, User, Phone, Mail, Award,
   CheckCircle, Loader2, AlertCircle, Users,
-  ChevronRight, X, Shield, Sparkles
+  ChevronRight, X, Shield, Sparkles, IndianRupee
 } from 'lucide-react';
-import { getUpcomingSeminars, registerForSeminar } from '../services/seminarService.js';
+import {
+  getUpcomingSeminars,
+  registerForSeminar,
+  cancelRegistration,
+  createRegistrationPayment,
+} from '../services/seminarService.js';
+import { loadRazorpayScript, openRazorpayCheckout, verifyPayment } from '../services/orderService.js';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -81,8 +87,9 @@ const SeminarRegister = ({ onRegister }) => {
 
     setStep('processing');
 
+    let savedReg = null;
     try {
-      await registerForSeminar({
+      savedReg = await registerForSeminar({
         name:      formData.name.trim(),
         age:       parseInt(formData.age, 10),
         sex:       formData.sex,
@@ -91,9 +98,29 @@ const SeminarRegister = ({ onRegister }) => {
         seminarId: selectedSeminar.id,
       });
 
+      // If fee > 0, open Razorpay payment
+      const fee = selectedSeminar?.fee ?? 0;
+      if (fee > 0 && savedReg?.id) {
+        const scriptLoaded = await loadRazorpayScript();
+        if (!scriptLoaded) throw new Error('Could not load payment gateway. Please try again.');
+
+        const paymentOrder = await createRegistrationPayment(savedReg.id);
+        const paymentResult = await openRazorpayCheckout(paymentOrder, {
+          name:   formData.name.trim(),
+          email:  formData.email.trim(),
+          mobile: formData.mobile.trim(),
+        });
+        await verifyPayment(paymentResult);
+      }
+
       if (onRegister) onRegister({ name: formData.name, email: formData.email });
       setStep('success');
     } catch (err) {
+      // If registration was created but payment was cancelled/failed, clean up
+      const fee = selectedSeminar?.fee ?? 0;
+      if (savedReg?.id && fee > 0) {
+        cancelRegistration(savedReg.id).catch(() => {/* best-effort */});
+      }
       setFormError(err.message || 'Something went wrong. Please try again.');
       setStep('form');
     }
@@ -116,10 +143,16 @@ const SeminarRegister = ({ onRegister }) => {
             Join Dr. Keval Dankhara's upcoming online webinars. Discover root-cause healing,
             ask questions live, and start your holistic health journey.
           </p>
-          {/* Free badge */}
-          <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-5 py-2 text-sm font-bold text-emerald-700">
-            <CheckCircle className="h-4 w-4" /> All seminars are 100% Free to attend
-          </div>
+          {/* Badge — changes based on whether any paid seminars exist */}
+          {seminars.some(s => (s.fee ?? 0) > 0) ? (
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-indigo-50 border border-indigo-200 px-5 py-2 text-sm font-bold text-indigo-700">
+              <IndianRupee className="h-4 w-4" /> Some seminars have a registration fee — check each card
+            </div>
+          ) : (
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-5 py-2 text-sm font-bold text-emerald-700">
+              <CheckCircle className="h-4 w-4" /> All seminars are 100% Free to attend
+            </div>
+          )}
         </div>
 
         {/* ── Seminar Cards ──────────────────────────────────────────────────── */}
@@ -213,18 +246,28 @@ const SeminarCard = ({ seminar, onRegister }) => {
         )}
       </div>
 
-      {/* Free badge + CTA */}
+      {/* Fee + CTA */}
       <div className="flex items-center justify-between pt-5 border-t border-primary/15">
         <div>
           <p className="text-[10px] text-text-light uppercase tracking-wider font-semibold">Admission</p>
-          <p className="text-lg font-extrabold font-serif text-emerald-700">Free</p>
+          {(seminar.fee ?? 0) === 0 ? (
+            <p className="text-lg font-extrabold font-serif text-emerald-700">Free</p>
+          ) : (
+            <p className="text-lg font-extrabold font-serif text-indigo-700">
+              ₹{Number(seminar.fee).toLocaleString('en-IN')}
+            </p>
+          )}
         </div>
         <button
           onClick={onRegister}
           disabled={isFull}
-          className="inline-flex items-center gap-2 rounded-xl bg-primary hover:bg-primary-dark text-text-dark hover:text-white font-bold px-5 py-2.5 text-xs uppercase tracking-wider shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group-hover:scale-105"
+          className={`inline-flex items-center gap-2 rounded-xl font-bold px-5 py-2.5 text-xs uppercase tracking-wider shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group-hover:scale-105 ${
+            (seminar.fee ?? 0) > 0
+              ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+              : 'bg-primary hover:bg-primary-dark text-text-dark hover:text-white'
+          }`}
         >
-          {isFull ? 'Sold Out' : 'Register Now'}
+          {isFull ? 'Sold Out' : (seminar.fee ?? 0) > 0 ? 'Register & Pay' : 'Register Now'}
           {!isFull && <ChevronRight className="h-3.5 w-3.5" />}
         </button>
       </div>
@@ -256,7 +299,7 @@ const RegistrationModal = ({ seminar, formData, step, formError, onChange, onSub
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <span className="text-[10px] font-bold tracking-widest text-primary-dark uppercase">
-              {step === 'success' ? 'Booking Confirmed' : 'Reserve Your Spot — Free'}
+              {step === 'success' ? 'Booking Confirmed' : (seminar?.fee > 0 ? `Reserve Your Spot — ₹${seminar.fee}` : 'Reserve Your Spot — Free')}
             </span>
             <h3 className="font-serif text-lg font-bold text-text-dark mt-0.5 leading-snug line-clamp-2">
               {seminar.topic}
@@ -362,11 +405,18 @@ const RegistrationModal = ({ seminar, formData, step, formError, onChange, onSub
         {step === 'form' && (
           <form id="seminar-reg-form" onSubmit={onSubmit} className="space-y-4">
 
-            {/* Free notice */}
-            <div className="rounded-xl px-4 py-3 text-xs font-semibold flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200">
-              <CheckCircle className="h-4 w-4 shrink-0" />
-              This seminar is <strong>completely free</strong>. Fill your details to confirm your seat.
-            </div>
+            {/* Seminar fee notice */}
+            {seminar?.fee > 0 ? (
+              <div className="rounded-xl px-4 py-3 text-xs font-semibold flex items-center gap-2 bg-amber-50 text-amber-800 border border-amber-200">
+                <IndianRupee className="h-4 w-4 shrink-0 text-amber-600" />
+                <span>Seminar Fee: <strong>₹ {Number(seminar.fee).toLocaleString("en-IN")}</strong>. Payment via Razorpay required to confirm seat.</span>
+              </div>
+            ) : (
+              <div className="rounded-xl px-4 py-3 text-xs font-semibold flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <CheckCircle className="h-4 w-4 shrink-0" />
+                <span>This seminar is <strong>completely free</strong>. Fill your details to confirm your seat.</span>
+              </div>
+            )}
 
             {/* Error */}
             {formError && (
@@ -460,7 +510,10 @@ const RegistrationModal = ({ seminar, formData, step, formError, onChange, onSub
             <div className="flex items-center justify-center gap-4 pt-1 text-[10px] text-slate-400 font-semibold">
               <span className="flex items-center gap-1"><Shield className="h-3.5 w-3.5" /> Secure &amp; Private</span>
               <span className="flex items-center gap-1"><Sparkles className="h-3.5 w-3.5" /> Instant Confirmation</span>
-              <span className="flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5 text-emerald-500" /> 100% Free</span>
+              <span className="flex items-center gap-1">
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
+                {seminar?.fee > 0 ? `Fee: ₹${Number(seminar.fee).toLocaleString("en-IN")}` : "100% Free"}
+              </span>
             </div>
           </form>
         )}
@@ -474,7 +527,15 @@ const RegistrationModal = ({ seminar, formData, step, formError, onChange, onSub
             form="seminar-reg-form"
             className="w-full rounded-xl bg-primary hover:bg-primary-dark text-text-dark hover:text-white font-bold py-4 text-sm uppercase tracking-wider shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
           >
-            <CheckCircle className="h-4 w-4" /> Confirm Free Registration
+            {seminar?.fee > 0 ? (
+              <>
+                <IndianRupee className="h-4 w-4" /> Register &amp; Pay ₹{Number(seminar.fee).toLocaleString("en-IN")}
+              </>
+            ) : (
+              <>
+                <CheckCircle className="h-4 w-4" /> Confirm Free Registration
+              </>
+            )}
           </button>
           <p className="text-center text-[10px] text-slate-400 mt-3">
             By registering you agree to our terms. The webinar link will be sent to your email.

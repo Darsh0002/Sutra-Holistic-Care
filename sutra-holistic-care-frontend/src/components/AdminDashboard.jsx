@@ -35,7 +35,7 @@ import {
   Settings,
   IndianRupee,
 } from "lucide-react";
-import { getDashboardStats, getConsultationFee, updateConsultationFee } from "../services/adminService.js";
+import { getDashboardStats, getConsultationFee, updateConsultationFee, createAdminOrder } from "../services/adminService.js";
 import {
   getAllSubscribers,
   getSubscriberStats,
@@ -80,11 +80,25 @@ const emptyProductForm = () => ({
 
 const emptySeminarForm = () => ({
   topic: "",
+  fee: 0,
   date: "",
   time: "",
   language: "Hindi / Gujarati",
   seminarLink: "",
   totalSeats: 100,
+});
+
+const emptyOrderForm = () => ({
+  name: "",
+  mobile: "",
+  email: "",
+  address: "",
+  productId: "",
+  packIndex: 0,
+  quantity: 1,
+  customTotalAmount: "",
+  status: "CONFIRMED",
+  paymentReference: "MANUAL",
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -147,12 +161,20 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
   const [trackingId, setTrackingId] = useState("");
   const [savingTracking, setSavingTracking] = useState(false);
 
+  // Manual order modal
+  const [orderModal, setOrderModal] = useState(false);
+  const [orderForm, setOrderForm] = useState(emptyOrderForm());
+  const [savingOrder, setSavingOrder] = useState(false);
+
   // Settings tab — consultation fee
   const [currentFee, setCurrentFee] = useState(null);
   const [feeInput, setFeeInput] = useState("");
   const [savingFee, setSavingFee] = useState(false);
   const [loadingFee, setLoadingFee] = useState(false);
   const feeLoaded = useRef(false);
+
+  // Logout confirmation
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
 
   // ─── Data fetchers ─────────────────────────────────────────────────────────
 
@@ -512,6 +534,88 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
     }
   };
 
+  // ─── Manual Order CRUD ──────────────────────────────────────────────────────
+
+  const openAddOrderModal = () => {
+    const initialProduct = products[0];
+    const initialPackPrice = initialProduct?.packs?.[0]?.price || 0;
+    setOrderForm({
+      ...emptyOrderForm(),
+      productId: initialProduct?.id || "",
+      customTotalAmount: initialPackPrice ? String(initialPackPrice) : "",
+    });
+    setOrderModal(true);
+    setActionError("");
+  };
+
+  const handleProductChangeInOrderForm = (productId) => {
+    const prod = products.find((p) => p.id === productId);
+    const packPrice = prod?.packs?.[0]?.price || 0;
+    const qty = orderForm.quantity || 1;
+    setOrderForm((f) => ({
+      ...f,
+      productId,
+      packIndex: 0,
+      customTotalAmount: packPrice ? String(packPrice * qty) : "",
+    }));
+  };
+
+  const handlePackChangeInOrderForm = (packIndex) => {
+    const prod = products.find((p) => p.id === orderForm.productId);
+    const packPrice = prod?.packs?.[packIndex]?.price || 0;
+    const qty = orderForm.quantity || 1;
+    setOrderForm((f) => ({
+      ...f,
+      packIndex: Number(packIndex),
+      customTotalAmount: packPrice ? String(packPrice * qty) : "",
+    }));
+  };
+
+  const handleQuantityChangeInOrderForm = (quantity) => {
+    const qty = Math.max(1, Number(quantity) || 1);
+    const prod = products.find((p) => p.id === orderForm.productId);
+    const packPrice = prod?.packs?.[orderForm.packIndex]?.price || 0;
+    setOrderForm((f) => ({
+      ...f,
+      quantity: qty,
+      customTotalAmount: packPrice ? String(packPrice * qty) : "",
+    }));
+  };
+
+  const handleSaveOrder = async (e) => {
+    e.preventDefault();
+    if (!orderForm.name || !orderForm.mobile || !orderForm.address || !orderForm.productId) {
+      showError("Please fill in all required fields (Name, Phone, Address, Product).");
+      return;
+    }
+    setSavingOrder(true);
+    setActionError("");
+    try {
+      const payload = {
+        name: orderForm.name.trim(),
+        mobile: orderForm.mobile.trim(),
+        email: orderForm.email.trim(),
+        address: orderForm.address.trim(),
+        productId: orderForm.productId,
+        packIndex: Number(orderForm.packIndex) || 0,
+        quantity: Number(orderForm.quantity) || 1,
+        customTotalAmount: orderForm.customTotalAmount !== "" ? Number(orderForm.customTotalAmount) : null,
+        status: orderForm.status || "CONFIRMED",
+        paymentReference: orderForm.paymentReference.trim() || "MANUAL",
+      };
+      await createAdminOrder(payload);
+      showSuccess(`Manual order for "${orderForm.name}" added successfully!`);
+      setOrderModal(false);
+      fetchOrders();
+      fetchStats();
+      fetchSubscribers();
+    } catch (err) {
+      showError(err.message || "Failed to create manual order.");
+    } finally {
+      setSavingOrder(false);
+    }
+  };
+
   // ─── Seminar CRUD ──────────────────────────────────────────────────────────
 
   const openAddSeminarModal = () => {
@@ -523,6 +627,7 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
   const openEditSeminarModal = (seminar) => {
     setSeminarForm({
       topic: seminar.topic || "",
+      fee: seminar.fee ?? 0,
       date: seminar.date || "",
       time: seminar.time || "",
       language: seminar.language || "Hindi / Gujarati",
@@ -560,7 +665,7 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
     try {
       const payload = {
         topic: seminarForm.topic.trim(),
-        fee: 0, // Seminars are always free
+        fee: Number(seminarForm.fee) || 0,
         date: seminarForm.date,
         time: seminarForm.time,
         language: seminarForm.language.trim(),
@@ -741,7 +846,7 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
             <span className="hidden sm:inline">View Site</span>
           </button>
           <button
-            onClick={onLogout}
+            onClick={() => setLogoutConfirm(true)}
             className="flex items-center gap-1.5 rounded-lg bg-red-50 hover:bg-red-100 px-2.5 sm:px-3 py-1.5 text-xs text-red-600 font-semibold transition-colors"
           >
             <LogOut className="h-3.5 w-3.5" />
@@ -833,9 +938,9 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
                     setLoadingFee(true);
                     getConsultationFee()
                       .then((data) => {
-                        const f = data?.fee ?? data;
-                        setCurrentFee(f);
-                        setFeeInput(String(f));
+                        const cf = data?.fee ?? data;
+                        setCurrentFee(cf);
+                        setFeeInput(String(cf));
                         feeLoaded.current = true;
                       })
                       .catch(() => setCurrentFee(null))
@@ -885,6 +990,14 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
                     className="block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 pl-9 text-xs placeholder-slate-400 focus:border-primary-dark focus:outline-hidden shadow-xs"
                   />
                 </div>
+                {activeTab === "orders" && (
+                  <button
+                    onClick={openAddOrderModal}
+                    className="flex items-center gap-1.5 rounded-lg bg-primary hover:bg-primary-dark text-text-dark hover:text-white px-4 py-2 text-xs font-bold uppercase tracking-wide transition-all shadow-sm shrink-0"
+                  >
+                    <Plus className="h-4 w-4" /> Add Manual Order
+                  </button>
+                )}
                 {activeTab === "products" && (
                   <button
                     onClick={openAddModal}
@@ -2080,21 +2193,258 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
                   </div>
                 </div>
               </div>
-
-              {/* Razorpay keys reminder */}
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl px-6 py-5 flex gap-4">
-                <div className="shrink-0 text-amber-500 mt-0.5"><ShieldCheck className="h-5 w-5" /></div>
-                <div>
-                  <p className="text-sm font-bold text-amber-800">Payment Gateway (Razorpay)</p>
-                  <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-                    To switch from test → live payments, update <code className="bg-amber-100 px-1 rounded font-mono">RAZORPAY_ID</code> and <code className="bg-amber-100 px-1 rounded font-mono">RAZORPAY_KEY</code> in your server's <code className="bg-amber-100 px-1 rounded font-mono">.env</code> file with your verified live keys from the Razorpay dashboard, then redeploy.
-                  </p>
-                </div>
-              </div>
             </div>
           )}
         </main>
       </div>
+
+      {/* ── Logout Confirmation Modal ────────────────────────────────────── */}
+      {logoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            {/* Top accent bar */}
+            <div className="h-1 w-full bg-gradient-to-r from-red-400 to-red-600" />
+            <div className="px-6 pt-6 pb-7">
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+                  <LogOut className="h-7 w-7 text-red-600" />
+                </div>
+              </div>
+              {/* Text */}
+              <h3 className="text-center text-lg font-extrabold text-slate-800 font-serif">
+                Confirm Logout
+              </h3>
+              <p className="mt-2 text-center text-sm text-slate-500 leading-relaxed">
+                Are you sure you want to logout of the<br />
+                <span className="font-semibold text-slate-700">Madhav Clinic Admin Console</span>?
+              </p>
+              {/* Buttons */}
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => setLogoutConfirm(false)}
+                  className="flex-1 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 py-2.5 text-sm font-semibold text-slate-700 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => { setLogoutConfirm(false); onLogout(); }}
+                  className="flex-1 rounded-xl bg-red-500 hover:bg-red-600 py-2.5 text-sm font-bold text-white shadow-sm transition-all flex items-center justify-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Manual Order Add Modal ────────────────────────────────────────── */}
+      {orderModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="relative w-full max-w-lg bg-bg-cream rounded-3xl overflow-hidden shadow-2xl border border-primary/20 max-h-[95vh] flex flex-col">
+            <div className="h-1.5 w-full bg-gradient-to-r from-primary via-primary-dark to-primary shrink-0" />
+            <div className="px-6 py-5 border-b border-primary/15 bg-white flex justify-between items-center shrink-0">
+              <div>
+                <span className="text-[10px] font-bold tracking-widest text-primary-dark uppercase">
+                  Manual Order Entry
+                </span>
+                <h3 className="font-serif text-xl font-bold text-text-dark">
+                  Add Manual Order
+                </h3>
+              </div>
+              <button
+                onClick={() => setOrderModal(false)}
+                className="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center text-text-light hover:bg-slate-100"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <form
+              onSubmit={handleSaveOrder}
+              className="flex-1 overflow-y-auto p-6 space-y-4 text-left"
+            >
+              {/* Customer Name */}
+              <div>
+                <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">
+                  Customer Full Name *
+                </label>
+                <input
+                  type="text"
+                  value={orderForm.name}
+                  onChange={(e) => setOrderForm((f) => ({ ...f, name: e.target.value }))}
+                  placeholder="e.g. Ramesh Patel"
+                  required
+                  className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                />
+              </div>
+
+              {/* Mobile & Email */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">
+                    Mobile / WhatsApp *
+                  </label>
+                  <input
+                    type="tel"
+                    value={orderForm.mobile}
+                    onChange={(e) => setOrderForm((f) => ({ ...f, mobile: e.target.value }))}
+                    placeholder="e.g. 9876543210"
+                    required
+                    className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">
+                    Email Address (Optional)
+                  </label>
+                  <input
+                    type="email"
+                    value={orderForm.email}
+                    onChange={(e) => setOrderForm((f) => ({ ...f, email: e.target.value }))}
+                    placeholder="customer@example.com"
+                    className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                  />
+                </div>
+              </div>
+
+              {/* Delivery Address */}
+              <div>
+                <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">
+                  Delivery Address *
+                </label>
+                <textarea
+                  value={orderForm.address}
+                  onChange={(e) => setOrderForm((f) => ({ ...f, address: e.target.value }))}
+                  placeholder="House No, Street, Landmark, City, Pincode"
+                  rows="2"
+                  required
+                  className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                />
+              </div>
+
+              {/* Product & Pack selection */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">
+                    Product *
+                  </label>
+                  <select
+                    value={orderForm.productId}
+                    onChange={(e) => handleProductChangeInOrderForm(e.target.value)}
+                    required
+                    className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                  >
+                    {products.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">
+                    Pack Size *
+                  </label>
+                  <select
+                    value={orderForm.packIndex}
+                    onChange={(e) => handlePackChangeInOrderForm(e.target.value)}
+                    className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                  >
+                    {(products.find((p) => p.id === orderForm.productId)?.packs || []).map((pack, idx) => (
+                      <option key={idx} value={idx}>
+                        {pack.weight}g — ₹{pack.price}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Quantity & Total Amount */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">
+                    Quantity *
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={orderForm.quantity}
+                    onChange={(e) => handleQuantityChangeInOrderForm(e.target.value)}
+                    required
+                    className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">
+                    Total Amount (₹ INR) *
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={orderForm.customTotalAmount}
+                    onChange={(e) => setOrderForm((f) => ({ ...f, customTotalAmount: e.target.value }))}
+                    placeholder="Total charged"
+                    required
+                    className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden font-bold"
+                  />
+                </div>
+              </div>
+
+              {/* Order Status & Payment Reference */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">
+                    Initial Order Status
+                  </label>
+                  <select
+                    value={orderForm.status}
+                    onChange={(e) => setOrderForm((f) => ({ ...f, status: e.target.value }))}
+                    className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                  >
+                    <option value="CONFIRMED">CONFIRMED (Payment Received)</option>
+                    <option value="SHIPPED">SHIPPED (In Transit)</option>
+                    <option value="DELIVERED">DELIVERED (Completed)</option>
+                    <option value="PENDING">PENDING (Payment Due / COD)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">
+                    Payment Reference / Method
+                  </label>
+                  <input
+                    type="text"
+                    value={orderForm.paymentReference}
+                    onChange={(e) => setOrderForm((f) => ({ ...f, paymentReference: e.target.value }))}
+                    placeholder="e.g. CASH_ON_DELIVERY, MANUAL, UPI_DIRECT"
+                    className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                  />
+                </div>
+              </div>
+
+              {/* Submit buttons */}
+              <div className="pt-3 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setOrderModal(false)}
+                  className="flex-1 rounded-xl border border-slate-200 bg-white py-3 text-xs font-bold uppercase tracking-wider text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingOrder}
+                  className="flex-1 rounded-xl bg-primary hover:bg-primary-dark text-text-dark hover:text-white py-3 text-xs font-bold uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {savingOrder ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  {savingOrder ? "Saving…" : "Save Order"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ── Seminar Add / Edit Modal ────────────────────────────────────────── */}
       {seminarModal && (
@@ -2208,11 +2558,28 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
                   registrants.
                 </p>
               </div>
-              {/* Fee is always 0 — seminars are free */}
-              <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-xs font-semibold text-emerald-800 flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 shrink-0 text-emerald-600" />
-                Admission is <strong>Free</strong> for all attendees — no
-                payment required.
+              {/* Per-seminar registration fee */}
+              <div>
+                <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1.5">
+                  Registration Fee (₹) — enter 0 for free
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-bold text-sm pointer-events-none">₹</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={seminarForm.fee}
+                    onChange={(e) =>
+                      setSeminarForm((f) => ({ ...f, fee: e.target.value }))
+                    }
+                    placeholder="0"
+                    className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 pl-8 pr-4 py-2.5 text-sm text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                  />
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Set to 0 to make this seminar free. Razorpay payment will be triggered for fees &gt; 0.
+                </p>
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1.5">

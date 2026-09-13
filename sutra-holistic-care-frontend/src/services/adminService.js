@@ -14,6 +14,11 @@ export const getDashboardStats = () => api.get('/admin/dashboard');
 export const getAllOrdersAdmin = () => api.get('/admin/orders');
 
 /**
+ * Create manual order (admin)
+ */
+export const createAdminOrder = (orderData) => api.post('/admin/orders', orderData);
+
+/**
  * Update order status (admin)
  * status: PENDING | PROCESSING | SHIPPED | DELIVERED | CANCELLED
  */
@@ -35,4 +40,3 @@ export const getConsultationFee = () => api.get('/admin/settings/consultation-fe
  */
 export const updateConsultationFee = (fee) =>
   api.putQuery(`/admin/settings/consultation-fee?fee=${fee}`);
-

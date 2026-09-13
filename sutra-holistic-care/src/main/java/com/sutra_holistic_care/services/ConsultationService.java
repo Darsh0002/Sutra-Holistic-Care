@@ -103,6 +103,22 @@ public class ConsultationService {
         consultationRepository.save(c);
     }
 
+    /**
+     * Called when the user cancels or abandons the Razorpay payment modal.
+     * Only deletes the consultation if it is still PENDING (never paid),
+     * so a race condition where payment succeeded just before the call is safe.
+     */
+    public void cancelUnpaidConsultation(String id) {
+        consultationRepository.findById(id).ifPresent(c -> {
+            if (c.getStatus() == Consultation.ConsultationStatus.PENDING) {
+                log.info("Deleting unpaid/cancelled consultation: {}", id);
+                consultationRepository.delete(c);
+            } else {
+                log.warn("cancelUnpaidConsultation called on non-PENDING consultation {}, ignoring.", id);
+            }
+        });
+    }
+
     public List<String> getAvailableSlots(LocalDate date) {
         List<Consultation> booked = consultationRepository.findByConsultationDateOrderByTimeSlotAsc(date);
         List<LocalTime> bookedSlots = booked.stream()

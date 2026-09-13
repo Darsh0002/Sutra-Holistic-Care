@@ -8,6 +8,14 @@ export const bookConsultation = (consultationRequest) =>
   api.post('/user/consultations', consultationRequest);
 
 /**
+ * Cancel an unpaid consultation — call this if the user dismisses or fails payment.
+ * The backend only deletes it if it's still PENDING, so this is safe to call.
+ */
+export const cancelConsultation = (id) =>
+  api.delete(`/user/consultations/${id}/cancel`);
+
+
+/**
  * Get a consultation by id (public)
  */
 export const getConsultation = (id) => api.get(`/user/consultations/${id}`);

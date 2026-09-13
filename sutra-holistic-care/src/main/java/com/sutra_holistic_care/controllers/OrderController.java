@@ -34,4 +34,15 @@ public class OrderController {
         List<Order> orders = orderService.getOrdersByEmail(email);
         return ResponseEntity.ok(ApiResponse.success(orders));
     }
+
+    /**
+     * Cancel an unpaid order — called by the frontend when the user
+     * dismisses or fails the Razorpay payment modal.
+     * Only deletes the record if it is still in PENDING status (never paid).
+     */
+    @DeleteMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<Void>> cancelOrder(@PathVariable String id) {
+        orderService.cancelUnpaidOrder(id);
+        return ResponseEntity.ok(ApiResponse.success("Order cancelled", null));
+    }
 }

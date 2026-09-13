@@ -43,8 +43,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String role = jwtUtils.getRoleFromToken(token);
 
                 List<SimpleGrantedAuthority> authorities = List.of();
-                if ("ADMIN".equals(role)) {
-                    authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                if ("SUPER_ADMIN".equalsIgnoreCase(role)) {
+                    authorities = List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"), new SimpleGrantedAuthority("ROLE_ADMIN"));
+                } else if ("STAFF".equalsIgnoreCase(role)) {
+                    authorities = List.of(new SimpleGrantedAuthority("ROLE_STAFF"), new SimpleGrantedAuthority("ROLE_ADMIN"));
+                } else {
+                    authorities = List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"), new SimpleGrantedAuthority("ROLE_ADMIN"));
                 }
 
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(

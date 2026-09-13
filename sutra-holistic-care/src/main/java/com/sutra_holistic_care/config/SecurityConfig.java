@@ -42,8 +42,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         // All user-facing endpoints - public, no auth needed
                         .requestMatchers("/api/user/**").permitAll()
-                        // Admin endpoints - JWT authentication required
-                        .requestMatchers("/api/admin/**").authenticated()
+                        // Super Admin exclusive endpoints
+                        .requestMatchers("/api/admin/staff/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/api/admin/logs/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/api/admin/settings/**").hasRole("SUPER_ADMIN")
+                        // Admin endpoints (SUPER_ADMIN and STAFF) - JWT authentication required
+                        .requestMatchers("/api/admin/**").hasAnyRole("SUPER_ADMIN", "STAFF", "ADMIN")
                         // Everything else - public
                         .anyRequest().permitAll()
                 )

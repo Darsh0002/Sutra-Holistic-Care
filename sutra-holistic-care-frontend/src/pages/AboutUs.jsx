@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import PolicyLayout from "../components/PolicyLayout";
 import {
@@ -323,7 +323,9 @@ const AboutUs = ({ onAdminToggle }) => {
               </span>
             </div>
             <p className="font-medium text-text-dark text-sm pl-6">
-              C 401 Opera Palm, Kholvad Gam, Kamrej
+              Shop No. 10, Opera Royal,
+              <br />
+              Kholvad Road, Pasodara Patiya,
               <br />
               Surat, Gujarat, India
             </p>

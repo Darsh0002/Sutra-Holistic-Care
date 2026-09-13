@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import PolicyLayout from "../components/PolicyLayout";
 import {
@@ -174,9 +174,11 @@ const ContactUs = ({ onAdminToggle }) => {
                 Business Address
               </h3>
               <p className="text-sm text-slate-300 leading-relaxed">
-                Madhav Clinic / Madhav Clinic
+                Madhav Clinic
                 <br />
-                C 401 Opera Palm, Kholvad Gam, Kamrej
+                Shop No. 10, Opera Royal,
+                <br />
+                Kholvad Road, Pasodara Patiya,
                 <br />
                 Surat, Gujarat, India
               </p>

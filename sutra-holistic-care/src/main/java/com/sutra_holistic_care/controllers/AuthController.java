@@ -16,6 +16,12 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/super-admin/register")
+    public ResponseEntity<ApiResponse<AuthResponse>> registerSuperAdmin(@RequestBody AdminRegisterRequest request) {
+        AuthResponse response = authService.registerSuperAdmin(request);
+        return ResponseEntity.ok(ApiResponse.success("Super Admin registered successfully", response));
+    }
+
     @PostMapping("/admin/register")
     public ResponseEntity<ApiResponse<AuthResponse>> registerAdmin(@RequestBody AdminRegisterRequest request) {
         AuthResponse response = authService.registerAdmin(request);

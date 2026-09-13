@@ -11,4 +11,6 @@ public class AdminRegisterRequest {
     private String password;
 
     private String mobile;
+
+    private String role;
 }

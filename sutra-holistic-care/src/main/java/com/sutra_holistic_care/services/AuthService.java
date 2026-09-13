@@ -20,27 +20,38 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
+    public AuthResponse registerSuperAdmin(AdminRegisterRequest request) {
+        request.setRole("SUPER_ADMIN");
+        return registerAdmin(request);
+    }
+
     public AuthResponse registerAdmin(AdminRegisterRequest request) {
         if (adminRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException("Email already registered");
         }
+
+        String role = (request.getRole() != null && !request.getRole().isBlank()) 
+                ? request.getRole().toUpperCase() 
+                : "STAFF";
 
         Admin admin = Admin.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .mobile(request.getMobile())
+                .role(role)
+                .createdAt(java.time.LocalDateTime.now())
                 .build();
 
         Admin saved = adminRepository.save(admin);
-        String token = jwtUtils.generateToken(saved.getEmail(), "ADMIN");
+        String token = jwtUtils.generateToken(saved.getEmail(), saved.getRole());
 
         return AuthResponse.builder()
                 .token(token)
                 .id(saved.getId())
                 .name(saved.getName())
                 .email(saved.getEmail())
-                .role("ADMIN")
+                .role(saved.getRole())
                 .build();
     }
 
@@ -52,14 +63,20 @@ public class AuthService {
             throw new BusinessException("Invalid credentials");
         }
 
-        String token = jwtUtils.generateToken(admin.getEmail(), "ADMIN");
+        // Migration fallback for legacy accounts without a role set
+        if (admin.getRole() == null || admin.getRole().isBlank()) {
+            admin.setRole("SUPER_ADMIN");
+            adminRepository.save(admin);
+        }
+
+        String token = jwtUtils.generateToken(admin.getEmail(), admin.getRole());
 
         return AuthResponse.builder()
                 .token(token)
                 .id(admin.getId())
                 .name(admin.getName())
                 .email(admin.getEmail())
-                .role("ADMIN")
+                .role(admin.getRole())
                 .build();
     }
 }

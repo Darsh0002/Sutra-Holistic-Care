@@ -19,6 +19,7 @@ public class AppSettingService {
     private static final String KEY_CONSULTATION_FEE = "CONSULTATION_FEE";
 
     private final AppSettingRepository appSettingRepository;
+    private final StaffActivityLogService activityLogService;
 
     /**
      * Returns the current consultation fee from MongoDB.
@@ -47,6 +48,7 @@ public class AppSettingService {
         setting.setSettingValue(String.valueOf(fee));
         appSettingRepository.save(setting);
         log.info("Consultation fee updated to: {}", fee);
+        activityLogService.logCurrentAdminAction("UPDATE_CONSULTATION_FEE", "SETTING", KEY_CONSULTATION_FEE, "Updated consultation fee to ₹" + fee);
         return fee;
     }
 }

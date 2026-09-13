@@ -23,4 +23,9 @@ public class Admin {
     private String password;
 
     private String mobile;
+
+    @Builder.Default
+    private String role = "STAFF";
+
+    private java.time.LocalDateTime createdAt;
 }

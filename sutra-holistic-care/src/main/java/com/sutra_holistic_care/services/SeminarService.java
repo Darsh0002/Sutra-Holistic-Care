@@ -20,6 +20,7 @@ import java.util.List;
 public class SeminarService {
 
     private final SeminarRepository seminarRepository;
+    private final StaffActivityLogService activityLogService;
 
     /**
      * Runs every day at midnight IST (18:30 UTC) to automatically deactivate
@@ -46,7 +47,9 @@ public class SeminarService {
                 .bookedSeats(0)
                 .active(true)
                 .build();
-        return seminarRepository.save(seminar);
+        Seminar saved = seminarRepository.save(seminar);
+        activityLogService.logCurrentAdminAction("CREATE_SEMINAR", "SEMINAR", saved.getId(), "Created seminar: " + saved.getTopic());
+        return saved;
     }
 
     public Seminar updateSeminar(String id, SeminarRequest request) {
@@ -58,13 +61,16 @@ public class SeminarService {
         seminar.setLanguage(request.getLanguage());
         seminar.setSeminarLink(request.getSeminarLink());
         seminar.setTotalSeats(request.getTotalSeats());
-        return seminarRepository.save(seminar);
+        Seminar saved = seminarRepository.save(seminar);
+        activityLogService.logCurrentAdminAction("UPDATE_SEMINAR", "SEMINAR", id, "Updated seminar: " + saved.getTopic());
+        return saved;
     }
 
     public void deleteSeminar(String id) {
         Seminar seminar = getSeminar(id);
         seminar.setActive(false);
         seminarRepository.save(seminar);
+        activityLogService.logCurrentAdminAction("DELETE_SEMINAR", "SEMINAR", id, "Deleted/deactivated seminar: " + seminar.getTopic());
     }
 
     public Seminar getSeminar(String id) {

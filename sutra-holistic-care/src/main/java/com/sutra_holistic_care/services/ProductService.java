@@ -14,6 +14,7 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final StaffActivityLogService activityLogService;
 
     public Product createProduct(ProductRequest request) {
         Product product = Product.builder()
@@ -25,7 +26,9 @@ public class ProductService {
                 .benefits(request.getBenefits())
                 .active(request.getActive() != null ? request.getActive() : true)
                 .build();
-        return productRepository.save(product);
+        Product saved = productRepository.save(product);
+        activityLogService.logCurrentAdminAction("CREATE_PRODUCT", "PRODUCT", saved.getId(), "Created product: " + saved.getName());
+        return saved;
     }
 
     public Product updateProduct(String id, ProductRequest request) {
@@ -37,13 +40,16 @@ public class ProductService {
         product.setIngredients(request.getIngredients());
         product.setBenefits(request.getBenefits());
         if (request.getActive() != null) product.setActive(request.getActive());
-        return productRepository.save(product);
+        Product saved = productRepository.save(product);
+        activityLogService.logCurrentAdminAction("UPDATE_PRODUCT", "PRODUCT", id, "Updated product: " + saved.getName());
+        return saved;
     }
 
     public void deleteProduct(String id) {
         Product product = getProduct(id);
         product.setActive(false);        // soft delete
         productRepository.save(product);
+        activityLogService.logCurrentAdminAction("DELETE_PRODUCT", "PRODUCT", id, "Deleted/deactivated product: " + product.getName());
     }
 
     public Product getProduct(String id) {

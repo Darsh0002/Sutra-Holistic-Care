@@ -20,10 +20,9 @@ import java.util.stream.Collectors;
 public class ConsultationService {
 
     private final ConsultationRepository consultationRepository;
-
     private final SubscriberService subscriberService;
-
     private final AppSettingService appSettingService;
+    private final StaffActivityLogService activityLogService;
 
     // Morning: 9 AM – 1 PM  |  Evening: 4 PM – 8 PM
     private static final List<LocalTime> ALL_SLOTS = List.of(
@@ -79,21 +78,27 @@ public class ConsultationService {
     public Consultation updateStatus(String id, Consultation.ConsultationStatus status) {
         Consultation c = getConsultation(id);
         c.setStatus(status);
-        return consultationRepository.save(c);
+        Consultation saved = consultationRepository.save(c);
+        activityLogService.logCurrentAdminAction("UPDATE_CONSULTATION_STATUS", "CONSULTATION", id, "Updated status of Consultation #" + id + " to " + status);
+        return saved;
     }
 
     public Consultation sendVideoLink(String id, String videoLink) {
         Consultation c = getConsultation(id);
         c.setVideoLink(videoLink);
         c.setStatus(Consultation.ConsultationStatus.CONFIRMED);
-        return consultationRepository.save(c);
+        Consultation saved = consultationRepository.save(c);
+        activityLogService.logCurrentAdminAction("SEND_VIDEO_LINK", "CONSULTATION", id, "Sent video consultation link for Consultation #" + id);
+        return saved;
     }
 
     public Consultation addDoctorNotes(String id, String notes) {
         Consultation c = getConsultation(id);
         c.setDoctorNotes(notes);
         c.setStatus(Consultation.ConsultationStatus.COMPLETED);
-        return consultationRepository.save(c);
+        Consultation saved = consultationRepository.save(c);
+        activityLogService.logCurrentAdminAction("ADD_DOCTOR_NOTES", "CONSULTATION", id, "Added doctor notes & completed Consultation #" + id);
+        return saved;
     }
 
     public void confirmPayment(String consultationId, String paymentId) {

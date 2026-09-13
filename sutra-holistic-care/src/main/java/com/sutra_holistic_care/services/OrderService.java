@@ -23,6 +23,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final SubscriberService subscriberService;
+    private final StaffActivityLogService activityLogService;
 
     public Order createOrder(OrderRequest request) {
         Product product = productRepository.findById(request.getProductId())
@@ -76,7 +77,9 @@ public class OrderService {
     public Order updateOrderStatus(String id, Order.OrderStatus status) {
         Order order = getOrder(id);
         order.setStatus(status);
-        return orderRepository.save(order);
+        Order saved = orderRepository.save(order);
+        activityLogService.logCurrentAdminAction("UPDATE_ORDER_STATUS", "ORDER", id, "Updated status of Order #" + id + " to " + status);
+        return saved;
     }
 
     public void confirmPayment(String orderId, String paymentId) {
@@ -110,7 +113,7 @@ public class OrderService {
         Order order = getOrder(id);
         order.setTrackingId(trackingId);
         Order saved = orderRepository.save(order);
-        // WhatsApp notification is now handled manually by the admin via wa.me redirect in the dashboard
+        activityLogService.logCurrentAdminAction("ADD_TRACKING_INFO", "ORDER", id, "Added tracking ID " + trackingId + " to Order #" + id);
         return saved;
     }
 
@@ -156,6 +159,7 @@ public class OrderService {
                 || saved.getStatus() == Order.OrderStatus.DELIVERED) {
             subscriberService.upsertFromOrder(saved);
         }
+        activityLogService.logCurrentAdminAction("CREATE_ADMIN_ORDER", "ORDER", saved.getId(), "Created manual order #" + saved.getId() + " for " + saved.getName());
         return saved;
     }
 }

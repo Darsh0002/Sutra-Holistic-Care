@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import {
   MessageCircle,
@@ -183,7 +183,9 @@ const Footer = ({ onAdminToggle }) => {
               <li className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                 <span>
-                  C 401 Opera Palm, Kholvad Gam, Kamrej
+                  Shop No. 10, Opera Royal,
+                  <br />
+                  Kholvad Road, Pasodara Patiya,
                   <br />
                   Surat, Gujarat, India
                 </span>

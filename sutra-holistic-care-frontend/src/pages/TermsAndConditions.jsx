@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import PolicyLayout from "../components/PolicyLayout";
 import {
   Globe,
@@ -63,7 +63,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
   return (
     <PolicyLayout
       title="Terms & Conditions"
-      subtitle="These Terms & Conditions govern your access to and use of our website, including the purchase of products and use of services offered by Sutra Holistic Care."
+      subtitle="These Terms & Conditions govern your access to and use of our website, including the purchase of products and use of services offered by Madhav Clinic."
       effectiveDate="July 8, 2026"
       onAdminToggle={onAdminToggle}
     >
@@ -95,7 +95,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
 
       {/* Intro */}
       <p className="text-sm leading-relaxed">
-        Welcome to <strong className="text-text-dark">Sutra Holistic Care</strong>. These Terms &amp; Conditions ("Terms")
+        Welcome to <strong className="text-text-dark">Madhav Clinic</strong>. These Terms &amp; Conditions ("Terms")
         govern your access to and use of{" "}
         <a
           href="https://drkevaldankhara.com"
@@ -106,7 +106,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
           https://drkevaldankhara.com
         </a>
         , including the purchase of products and use of services offered by
-        Sutra Holistic Care.
+        Madhav Clinic.
       </p>
       <p className="text-sm leading-relaxed mt-3">
         By accessing or using this website, you agree to be bound by these Terms
@@ -117,7 +117,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
       {/* Section 1 */}
       <SectionTitle id="about-us" number={1} title="About Us" />
       <p className="text-sm leading-relaxed mb-4">
-        This website is owned and operated by Sutra Holistic Care, founded by
+        This website is owned and operated by Madhav Clinic, founded by
         Dr. Keval Dankhara (BHMS).
       </p>
       <div className="rounded-xl bg-bg-cream border border-primary/10 p-5">
@@ -127,7 +127,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div>
             <span className="text-xs text-text-light">Business Name</span>
-            <p className="font-medium text-text-dark">Sutra Holistic Care</p>
+            <p className="font-medium text-text-dark">Madhav Clinic</p>
           </div>
           <div>
             <span className="text-xs text-text-light">Founder</span>
@@ -137,7 +137,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
           </div>
           <div>
             <span className="text-xs text-text-light">Clinic</span>
-            <p className="font-medium text-text-dark">Radhe Clinic</p>
+            <p className="font-medium text-text-dark">Madhav Clinic</p>
           </div>
           <div>
             <span className="text-xs text-text-light">Website</span>
@@ -236,7 +236,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
           "Prices may be updated at any time without prior notice.",
           "Applicable taxes and shipping charges, if any, will be shown during checkout.",
           "Payments are processed through secure third-party payment gateway providers.",
-          "Sutra Holistic Care does not store sensitive payment information such as debit/credit card numbers, CVV, UPI PINs, or banking passwords.",
+          "Madhav Clinic does not store sensitive payment information such as debit/credit card numbers, CVV, UPI PINs, or banking passwords.",
         ]}
       />
 
@@ -269,7 +269,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
       <SectionTitle id="ip" number={7} title="Intellectual Property" />
       <p className="text-sm leading-relaxed">
         Unless otherwise stated, all content available on this website is the
-        exclusive property of Sutra Holistic Care, including but not limited to:
+        exclusive property of Madhav Clinic, including but not limited to:
       </p>
       <BulletList
         items={[
@@ -291,7 +291,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
       <p className="text-sm leading-relaxed mt-3">
         No content may be copied, reproduced, modified, distributed, published,
         or used for commercial purposes without prior written permission from
-        Sutra Holistic Care.
+        Madhav Clinic.
       </p>
 
       {/* Section 8 */}
@@ -317,7 +317,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
       </p>
       <BulletList
         items={[
-          "Sutra Holistic Care shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from the use of this website or its products.",
+          "Madhav Clinic shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from the use of this website or its products.",
           "We are not responsible for delays caused by courier services, natural disasters, government actions, internet failures, or other events beyond our reasonable control.",
           "Individual experiences with wellness products may vary. We do not guarantee specific health outcomes or results.",
         ]}
@@ -363,7 +363,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
       {/* Section 13 */}
       <SectionTitle id="changes" number={13} title="Changes to These Terms" />
       <p className="text-sm leading-relaxed">
-        Sutra Holistic Care reserves the right to modify or update these Terms
+        Madhav Clinic reserves the right to modify or update these Terms
         &amp; Conditions at any time without prior notice. Any changes will
         become effective immediately upon publication on this website. Continued
         use of the website after such changes constitutes acceptance of the
@@ -378,10 +378,10 @@ const TermsAndConditions = ({ onAdminToggle }) => {
       </p>
       <div className="rounded-xl bg-bg-cream border border-primary/10 p-5 space-y-3">
         <h4 className="font-serif text-lg font-bold text-text-dark">
-          Sutra Holistic Care
+          Madhav Clinic
         </h4>
         <p className="text-xs text-text-light">
-          Founder: Dr. Keval Dankhara (BHMS) &bull; Clinic: Radhe Clinic
+          Founder: Dr. Keval Dankhara (BHMS) &bull; Clinic: Madhav Clinic
         </p>
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2.5">
@@ -408,7 +408,7 @@ const TermsAndConditions = ({ onAdminToggle }) => {
           </div>
         </div>
         <p className="text-xs text-text-light pt-2">
-          We appreciate your trust in Sutra Holistic Care and thank you for
+          We appreciate your trust in Madhav Clinic and thank you for
           choosing us as your wellness partner.
         </p>
       </div>

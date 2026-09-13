@@ -71,7 +71,7 @@ const HomePage = ({
                     d="M4 12a8 8 0 018-8v8z"
                   ></path>
                 </svg>
-                Loading Sutra Products…
+                Loading Products…
               </div>
             </div>
           </section>
@@ -147,7 +147,7 @@ const App = () => {
   const handleProductInquiry = (product) => {
     const price = product.price || getDisplayPrice(product);
     const msg = encodeURIComponent(
-      `Hi Dr. Keval, I visited your SUTRA Holistic Care portal and would like to order ${product.name} (₹${price}). Please guide me on payment and shipping options.`,
+      `Hi Dr. Keval, I visited your Madhav Clinic portal and would like to order ${product.name} (₹${price}). Please guide me on payment and shipping options.`,
     );
     window.open(`https://wa.me/919537051626?text=${msg}`, "_blank");
   };

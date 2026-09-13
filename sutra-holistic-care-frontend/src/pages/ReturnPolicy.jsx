@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import PolicyLayout from "../components/PolicyLayout";
 import {
   Globe,
@@ -83,7 +83,7 @@ const ReturnPolicy = ({ onAdminToggle }) => {
 
       {/* Intro */}
       <p className="text-sm leading-relaxed">
-        At <strong className="text-text-dark">Sutra Holistic Care</strong>, we are committed to delivering
+        At <strong className="text-text-dark">Madhav Clinic</strong>, we are committed to delivering
         high-quality wellness products. Due to the nature of herbal and wellness
         products, we maintain strict quality and hygiene standards. Please read
         our Return Policy carefully before placing your order.
@@ -244,7 +244,7 @@ const ReturnPolicy = ({ onAdminToggle }) => {
         ]}
       />
       <p className="text-sm leading-relaxed mt-3">
-        Sutra Holistic Care will guide you through the return process.
+        Madhav Clinic will guide you through the return process.
       </p>
       <p className="text-sm leading-relaxed mt-2">
         If the return is requested for reasons not covered under this policy,
@@ -275,10 +275,10 @@ const ReturnPolicy = ({ onAdminToggle }) => {
       </p>
       <div className="rounded-xl bg-bg-cream border border-primary/10 p-5 space-y-3">
         <h4 className="font-serif text-lg font-bold text-text-dark">
-          Sutra Holistic Care
+          Madhav Clinic
         </h4>
         <p className="text-xs text-text-light">
-          Founder: Dr. Keval Dankhara (BHMS) &bull; Clinic: Radhe Clinic
+          Founder: Dr. Keval Dankhara (BHMS) &bull; Clinic: Madhav Clinic
         </p>
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2.5">
@@ -312,7 +312,7 @@ const ReturnPolicy = ({ onAdminToggle }) => {
 
       {/* Policy Updates */}
       <div className="mt-10 p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">
-        <strong className="text-slate-800">Policy Updates:</strong> Sutra Holistic Care reserves
+        <strong className="text-slate-800">Policy Updates:</strong> Madhav Clinic reserves
         the right to modify or update this Return Policy at any time without
         prior notice. Any changes will be published on this page with the
         updated effective date.

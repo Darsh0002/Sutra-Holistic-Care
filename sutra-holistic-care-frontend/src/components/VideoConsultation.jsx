@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Video, Calendar, Clock, User, Phone, Mail, FileText, CheckCircle, ArrowRight, ShieldCheck, AlertCircle, Loader2, Sun, Sunset } from 'lucide-react';
 import { bookConsultation } from '../services/consultationService.js';
 import { loadRazorpayScript, openRazorpayCheckout, verifyPayment } from '../services/orderService.js';
@@ -44,6 +44,16 @@ const VideoConsultation = ({ onBook }) => {
   const [loading, setLoading]         = useState(false);
   const [bookingId, setBookingId]     = useState(null);
   const [paymentDone, setPaymentDone] = useState(false);
+  const [consultationFee, setConsultationFee] = useState(null);
+  const [feeLoading, setFeeLoading]   = useState(true);
+
+  // Fetch the live consultation fee from the public API
+  useEffect(() => {
+    api.get('/user/payments/consultation-fee')
+      .then((fee) => setConsultationFee(fee))
+      .catch(() => setConsultationFee(null))
+      .finally(() => setFeeLoading(false));
+  }, []);
 
   // 6 upcoming days (skip Sundays)
   const getDateOptions = () => {
@@ -228,11 +238,11 @@ const VideoConsultation = ({ onBook }) => {
                     Booking ID: {bookingId}
                   </p>
                 )}
-                {paymentDone && (
-                  <div className="mt-3 inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border border-emerald-200 mx-auto">
-                    <CheckCircle className="h-3.5 w-3.5" /> Payment of ₹ 100 received
-                  </div>
-                )}
+                  {paymentDone && (
+                    <div className="mt-3 inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border border-emerald-200 mx-auto">
+                      <CheckCircle className="h-3.5 w-3.5" /> Payment of ₹ {consultationFee !== null ? consultationFee.toLocaleString('en-IN') : '—'} received
+                    </div>
+                  )}
                 <p className="mt-4 text-sm text-text-light leading-relaxed max-w-md mx-auto text-center">
                   Thank you, <strong>{formData.name}</strong>. Your{' '}
                   <strong>{formData.session?.label}</strong> slot on{' '}
@@ -338,8 +348,16 @@ const VideoConsultation = ({ onBook }) => {
                     <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 flex items-center gap-3">
                       <span className="text-amber-500 text-lg font-bold">₹</span>
                       <div>
-                        <p className="text-xs font-bold text-amber-800">Booking Fee: ₹ 100</p>
-                        <p className="text-[10px] text-amber-600">Pay in the next step. Secure & Instant.</p>
+                        {feeLoading ? (
+                          <p className="text-xs font-bold text-amber-800 flex items-center gap-1"><Loader2 className="h-3 w-3 animate-spin" /> Loading fee…</p>
+                        ) : consultationFee !== null ? (
+                          <>
+                            <p className="text-xs font-bold text-amber-800">Booking Fee: ₹ {consultationFee.toLocaleString('en-IN')}</p>
+                            <p className="text-[10px] text-amber-600">Pay in the next step. Secure &amp; Instant.</p>
+                          </>
+                        ) : (
+                          <p className="text-xs font-bold text-amber-800">Booking fee will be shown at checkout.</p>
+                        )}
                       </div>
                     </div>
 
@@ -431,7 +449,9 @@ const VideoConsultation = ({ onBook }) => {
                     <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 flex items-center gap-3">
                       <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0" />
                       <div>
-                        <p className="text-xs font-bold text-emerald-800">Secure payment of ₹ 100</p>
+                        <p className="text-xs font-bold text-emerald-800">
+                          {consultationFee !== null ? `Secure payment of ₹ ${consultationFee.toLocaleString('en-IN')}` : 'Secure payment'}
+                        </p>
                         <p className="text-[10px] text-emerald-600">Clicking below will book your slot and open the payment window.</p>
                       </div>
                     </div>
@@ -442,7 +462,7 @@ const VideoConsultation = ({ onBook }) => {
                         Back
                       </button>
                       <button type="submit" disabled={loading} className="rounded-xl bg-primary text-text-dark font-bold hover:bg-primary-dark hover:text-white px-6 py-3 text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
-                        {loading ? (<><Loader2 className="h-4 w-4 animate-spin" />Processing…</>) : 'Book & Pay ₹ 100'}
+                        {loading ? (<><Loader2 className="h-4 w-4 animate-spin" />Processing…</>) : `Book & Pay${consultationFee !== null ? ` ₹ ${consultationFee.toLocaleString('en-IN')}` : ''}`}
                       </button>
                     </div>
                   </form>

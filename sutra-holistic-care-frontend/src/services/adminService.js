@@ -19,3 +19,20 @@ export const getAllOrdersAdmin = () => api.get('/admin/orders');
  */
 export const updateOrderStatusAdmin = (id, status) =>
   api.putQuery(`/admin/orders/${id}/status?status=${status}`);
+
+// ─── Settings ─────────────────────────────────────────────────
+
+/**
+ * Get current consultation fee (admin, JWT required)
+ * Returns { fee: number }
+ */
+export const getConsultationFee = () => api.get('/admin/settings/consultation-fee');
+
+/**
+ * Update consultation fee (admin, JWT required)
+ * @param {number} fee - New fee in INR (must be > 0)
+ * Returns { fee: number }
+ */
+export const updateConsultationFee = (fee) =>
+  api.putQuery(`/admin/settings/consultation-fee?fee=${fee}`);
+

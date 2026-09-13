@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   Calendar, Clock, Video, User, Phone, Mail, Award,
   CheckCircle, Loader2, AlertCircle, Users,
@@ -315,7 +315,7 @@ const RegistrationModal = ({ seminar, formData, step, formError, onChange, onSub
                 </a>
                 {/* WhatsApp share with link */}
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`I just registered for the seminar *"${seminar.topic}"* by Dr. Keval Dankhara (Sutra Holistic Care)!\n\n\uD83D\uDCC5 ${formatDate(seminar.date)} at ${formatTime(seminar.time)}\n\uD83C\uDFA5 Join here: ${seminar.seminarLink}`)}`}
+                  href={`https://wa.me/?text=${encodeURIComponent(`I just registered for the seminar *"${seminar.topic}"* by Dr. Keval Dankhara (Madhav Clinic)!\n\n\uD83D\uDCC5 ${formatDate(seminar.date)} at ${formatTime(seminar.time)}\n\uD83C\uDFA5 Join here: ${seminar.seminarLink}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 text-sm uppercase tracking-wider shadow-sm transition-all flex items-center justify-center gap-2"

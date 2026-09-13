@@ -1,8 +1,8 @@
-export const generalFAQ = [
+﻿export const generalFAQ = [
   {
-    question: "What is Sutra Holistic Care?",
+    question: "What is Madhav Clinic?",
     answer:
-      "Sutra Holistic Care is a comprehensive wellness platform combining ancient nature-based remedy wisdom with modern healthcare. We offer personalized video consultations with expert herbal medicines practitioners, authentic wellness products, and educational seminars to guide you on your holistic health journey.",
+      "Madhav Clinic is a comprehensive wellness platform combining ancient nature-based remedy wisdom with modern healthcare. We offer personalized video consultations with expert herbal medicines practitioners, authentic wellness products, and educational seminars to guide you on your holistic health journey.",
   },
   {
     question: "How do I book a video consultation with a doctor?",

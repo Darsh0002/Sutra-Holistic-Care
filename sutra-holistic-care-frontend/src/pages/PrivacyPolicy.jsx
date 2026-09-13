@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import PolicyLayout from "../components/PolicyLayout";
 import {
@@ -91,7 +91,7 @@ const PrivacyPolicy = ({ onAdminToggle }) => {
 
       {/* Intro */}
       <p className="text-sm leading-relaxed">
-        Welcome to <strong className="text-text-dark">Sutra Holistic Care</strong> ("we," "our," or "us"). Your privacy is
+        Welcome to <strong className="text-text-dark">Madhav Clinic</strong> ("we," "our," or "us"). Your privacy is
         important to us. This Privacy Policy explains how we collect, use,
         protect, and disclose your personal information when you visit{" "}
         <a
@@ -242,7 +242,7 @@ const PrivacyPolicy = ({ onAdminToggle }) => {
         gateway providers that use industry-standard encryption technologies.
       </p>
       <div className="mt-3 p-4 rounded-lg bg-blue-50 border border-blue-200 text-sm text-blue-800">
-        <strong>Sutra Holistic Care</strong> never stores your complete card
+        <strong>Madhav Clinic</strong> never stores your complete card
         details, banking credentials, UPI PIN, CVV, or internet banking
         passwords. Your payment information is handled directly by our payment
         partners in accordance with applicable security standards.
@@ -337,10 +337,10 @@ const PrivacyPolicy = ({ onAdminToggle }) => {
       </p>
       <div className="rounded-xl bg-bg-cream border border-primary/10 p-5 space-y-3">
         <h4 className="font-serif text-lg font-bold text-text-dark">
-          Sutra Holistic Care
+          Madhav Clinic
         </h4>
         <p className="text-xs text-text-light">
-          Founder: Dr. Keval Dankhara (BHMS) &bull; Clinic: Radhe Clinic
+          Founder: Dr. Keval Dankhara (BHMS) &bull; Clinic: Madhav Clinic
         </p>
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2.5">

@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import PolicyLayout from "../components/PolicyLayout";
 import {
   Globe,
@@ -85,7 +85,7 @@ const RefundPolicy = ({ onAdminToggle }) => {
 
       {/* Intro */}
       <p className="text-sm leading-relaxed">
-        At <strong className="text-text-dark">Sutra Holistic Care</strong>, customer satisfaction is important to us.
+        At <strong className="text-text-dark">Madhav Clinic</strong>, customer satisfaction is important to us.
         We strive to ensure that every order reaches you in excellent condition.
         If an issue occurs, this Refund Policy explains when refunds may be
         provided and how they are processed.
@@ -261,10 +261,10 @@ const RefundPolicy = ({ onAdminToggle }) => {
       </p>
       <div className="rounded-xl bg-bg-cream border border-primary/10 p-5 space-y-3">
         <h4 className="font-serif text-lg font-bold text-text-dark">
-          Sutra Holistic Care
+          Madhav Clinic
         </h4>
         <p className="text-xs text-text-light">
-          Founder: Dr. Keval Dankhara (BHMS) &bull; Clinic: Radhe Clinic
+          Founder: Dr. Keval Dankhara (BHMS) &bull; Clinic: Madhav Clinic
         </p>
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2.5">
@@ -298,7 +298,7 @@ const RefundPolicy = ({ onAdminToggle }) => {
 
       {/* Policy Updates */}
       <div className="mt-10 p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">
-        <strong className="text-slate-800">Policy Updates:</strong> Sutra Holistic Care reserves
+        <strong className="text-slate-800">Policy Updates:</strong> Madhav Clinic reserves
         the right to amend or update this Refund Policy at any time without
         prior notice. Any changes will be published on this page with the
         updated effective date.

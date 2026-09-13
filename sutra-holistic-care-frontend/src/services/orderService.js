@@ -82,7 +82,7 @@ export const openRazorpayCheckout = (paymentOrderResponse, customerInfo) =>
       key:         paymentOrderResponse.keyId,
       amount:      paymentOrderResponse.amount,       // in paise
       currency:    paymentOrderResponse.currency || 'INR',
-      name:        'Sutra Holistic Care',
+      name:        'Madhav Clinic',
       description: paymentOrderResponse.description || 'Product Order',
       order_id:    paymentOrderResponse.razorpayOrderId,
       prefill: {

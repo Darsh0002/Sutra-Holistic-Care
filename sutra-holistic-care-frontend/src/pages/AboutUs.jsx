@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import PolicyLayout from "../components/PolicyLayout";
 import {
@@ -82,7 +82,7 @@ const AboutUs = ({ onAdminToggle }) => {
   return (
     <PolicyLayout
       title="About Us"
-      subtitle="Discover the story behind Sutra Holistic Care — where ancient wisdom meets modern wellness, guided by a passion for natural healing."
+      subtitle="Discover the story behind Madhav Clinic — where ancient wisdom meets modern wellness, guided by a passion for natural healing."
       onAdminToggle={onAdminToggle}
     >
       {/* Mission Statement */}
@@ -124,12 +124,12 @@ const AboutUs = ({ onAdminToggle }) => {
         </div>
         <div className="space-y-4 text-sm text-text-light leading-relaxed">
           <p>
-            <strong className="text-text-dark">Sutra Holistic Care</strong> is a
+            <strong className="text-text-dark">Madhav Clinic</strong> is a
             wellness brand founded by{" "}
             <strong className="text-text-dark">Dr. Keval Dankhara (BHMS)</strong>
             , a dedicated practitioner committed to the philosophy of holistic
             healing. Operating from{" "}
-            <strong className="text-text-dark">Radhe Clinic</strong> in Surat,
+            <strong className="text-text-dark">Madhav Clinic</strong> in Surat,
             Gujarat, Dr. Keval brings together classical homeopathic knowledge
             with carefully formulated botanical blends.
           </p>
@@ -141,7 +141,7 @@ const AboutUs = ({ onAdminToggle }) => {
             personalized lifestyle counseling.
           </p>
           <p>
-            Today, Sutra Holistic Care offers a curated range of herbal wellness
+            Today, Madhav Clinic offers a curated range of herbal wellness
             products through our online store, along with video consultations
             and health seminars, making quality holistic healthcare accessible
             to people across India.
@@ -165,13 +165,13 @@ const AboutUs = ({ onAdminToggle }) => {
               </h3>
               <p className="text-sm text-text-light leading-relaxed">
                 A qualified BHMS practitioner with a deep passion for holistic
-                healing, Dr. Keval Dankhara founded Sutra Holistic Care to bridge
+                healing, Dr. Keval Dankhara founded Madhav Clinic to bridge
                 the gap between traditional wisdom and modern wellness needs. His
                 approach combines homeopathic principles with herbal expertise to
                 develop natural formulations that support overall wellbeing.
               </p>
               <p className="text-sm text-text-light leading-relaxed mt-3">
-                Through Radhe Clinic, Dr. Keval provides personalized
+                Through Madhav Clinic, Dr. Keval provides personalized
                 consultations, both in-person and via video, helping patients
                 across India achieve better health through natural, sustainable
                 approaches.
@@ -301,7 +301,7 @@ const AboutUs = ({ onAdminToggle }) => {
               </span>
             </div>
             <p className="font-medium text-text-dark text-sm pl-6">
-              Sutra Holistic Care
+              Madhav Clinic
             </p>
           </div>
           <div className="space-y-2">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   LayoutDashboard,
   Video,
@@ -32,8 +32,10 @@ import {
   Activity,
   Menu,
   Send,
+  Settings,
+  IndianRupee,
 } from "lucide-react";
-import { getDashboardStats } from "../services/adminService.js";
+import { getDashboardStats, getConsultationFee, updateConsultationFee } from "../services/adminService.js";
 import {
   getAllSubscribers,
   getSubscriberStats,
@@ -144,6 +146,13 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
   const [trackingModal, setTrackingModal] = useState(null); // order object
   const [trackingId, setTrackingId] = useState("");
   const [savingTracking, setSavingTracking] = useState(false);
+
+  // Settings tab — consultation fee
+  const [currentFee, setCurrentFee] = useState(null);
+  const [feeInput, setFeeInput] = useState("");
+  const [savingFee, setSavingFee] = useState(false);
+  const [loadingFee, setLoadingFee] = useState(false);
+  const feeLoaded = useRef(false);
 
   // ─── Data fetchers ─────────────────────────────────────────────────────────
 
@@ -300,7 +309,7 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
   const handleWaBookingReceived = (c) => {
     const mobile = (c.mobile || "").replace(/[^0-9]/g, "");
     const msg = encodeURIComponent(
-      `Hello ${c.patientName}! 🙏\n\nThank you for booking a consultation at *Sutra Holistic Care*.\n\n📅 Date: ${c.consultationDate}\n⏰ Time: ${c.timeSlot}\n\nWe have received your request and our team will confirm your slot shortly. Please keep this number handy.\n\n— Dr. Keval Dankhara | Radhe Clinic`,
+      `Hello ${c.patientName}! 🙏\n\nThank you for booking a consultation at *Madhav Clinic*.\n\n📅 Date: ${c.consultationDate}\n⏰ Time: ${c.timeSlot}\n\nWe have received your request and our team will confirm your slot shortly. Please keep this number handy.\n\n— Dr. Keval Dankhara | Madhav Clinic`,
     );
     window.open(`https://wa.me/${mobile}?text=${msg}`, "_blank");
   };
@@ -310,7 +319,7 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
     const mobile = (c.mobile || "").replace(/[^0-9]/g, "");
     const link = c.videoLink || "Link will be shared before the session";
     const msg = encodeURIComponent(
-      `Hello ${c.patientName}! ✅\n\nYour video consultation at *Sutra Holistic Care* is confirmed.\n\n📅 Date: ${c.consultationDate}\n⏰ Time: ${c.timeSlot}\n🎥 Google Meet: ${link}\n\nPlease join on time. Feel free to reach out if you have any questions.\n\n— Dr. Keval Dankhara | Radhe Clinic 🌿`,
+      `Hello ${c.patientName}! ✅\n\nYour video consultation at *Madhav Clinic* is confirmed.\n\n📅 Date: ${c.consultationDate}\n⏰ Time: ${c.timeSlot}\n🎥 Google Meet: ${link}\n\nPlease join on time. Feel free to reach out if you have any questions.\n\n— Dr. Keval Dankhara | Madhav Clinic 🌿`,
     );
     window.open(`https://wa.me/${mobile}?text=${msg}`, "_blank");
   };
@@ -320,7 +329,7 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
     const mobile = (o.mobile || "").replace(/[^0-9]/g, "");
     const productName = o.product?.name || "your product";
     const msg = encodeURIComponent(
-      `Hello ${o.name}! 🛒\n\nYour order for *${productName}* has been received at *Sutra Holistic Care*.\n\n📦 Order ID: ${o.id}\n💰 Amount: ₹${(o.totalAmount || 0).toLocaleString("en-IN")}\n\nWe will process and ship your order soon. You'll receive your tracking details once dispatched.\n\nThank you for choosing Sutra! 🌿\n— Radhe Clinic`,
+      `Hello ${o.name}! 🛒\n\nYour order for *${productName}* has been received at *Madhav Clinic*.\n\n📦 Order ID: ${o.id}\n💰 Amount: ₹${(o.totalAmount || 0).toLocaleString("en-IN")}\n\nWe will process and ship your order soon. You'll receive your tracking details once dispatched.\n\nThank you for choosing Madhav Clinic! 🌿\n— Madhav Clinic`,
     );
     window.open(`https://wa.me/${mobile}?text=${msg}`, "_blank");
   };
@@ -330,7 +339,7 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
     const mobile = (order.mobile || "").replace(/[^0-9]/g, "");
     const productName = order.product?.name || "your order";
     const msg = encodeURIComponent(
-      `Hello ${order.name}! 📦\n\nGreat news — your order of *${productName}* has been shipped!\n\n🔍 Tracking ID: ${tId}\nTrack here: https://trackcourier.io/anjani-courier-tracking\n\nIf you have any questions, reply here.\n\n— Sutra Holistic Care 🌿`,
+      `Hello ${order.name}! 📦\n\nGreat news — your order of *${productName}* has been shipped!\n\n🔍 Tracking ID: ${tId}\nTrack here: https://trackcourier.io/anjani-courier-tracking\n\nIf you have any questions, reply here.\n\n— Madhav Clinic 🌿`,
     );
     window.open(`https://wa.me/${mobile}?text=${msg}`, "_blank");
   };
@@ -347,7 +356,7 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
       ? `\n\uD83C\uDF9E *Join Link:* ${link}\n`
       : "\nThe joining link will be shared before the event.\n";
     const msg = encodeURIComponent(
-      `Hello ${r.name}! \uD83C\uDF93\n\nYour registration for the seminar *"${r.seminarTopic || "Health Seminar"}"* is confirmed at *Sutra Holistic Care*.\n\n\u2705 This seminar is FREE${linkLine}\n\u2014 Dr. Keval Dankhara | Radhe Clinic \uD83C\uDF3F`,
+      `Hello ${r.name}! 🎓\n\nYour registration for the seminar *"${r.seminarTopic || "Health Seminar"}"* is confirmed at *Madhav Clinic*.\n\n✅ This seminar is FREE${linkLine}\n— Dr. Keval Dankhara | Madhav Clinic 🌿`,
     );
     window.open(`https://wa.me/${mobile}?text=${msg}`, "_blank");
   };
@@ -708,7 +717,7 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
               Dr. Keval's Console
             </span>
             <span className="text-[10px] font-sans font-bold text-emerald-600 uppercase tracking-widest leading-none block mt-0.5">
-              Radhe Clinic Dashboard
+              Madhav Clinic Dashboard
             </span>
           </div>
         </div>
@@ -804,6 +813,11 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
                 icon: Users,
                 label: `Subscribers (${subscribers.length})`,
               },
+              {
+                id: "settings",
+                icon: Settings,
+                label: "Settings",
+              },
             ].map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
@@ -813,7 +827,20 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
                   setActionError("");
                   setActionSuccess("");
                   setSeminarSubTab("manage");
-                  setSidebarOpen(false); // close drawer on mobile after selection
+                  setSidebarOpen(false);
+                  // Load fee when settings tab is first opened
+                  if (id === "settings" && !feeLoaded.current) {
+                    setLoadingFee(true);
+                    getConsultationFee()
+                      .then((data) => {
+                        const f = data?.fee ?? data;
+                        setCurrentFee(f);
+                        setFeeInput(String(f));
+                        feeLoaded.current = true;
+                      })
+                      .catch(() => setCurrentFee(null))
+                      .finally(() => setLoadingFee(false));
+                  }
                 }}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                   activeTab === id
@@ -827,8 +854,8 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
             ))}
           </div>
           <div className="p-4 border-t border-slate-800 text-[10px] text-slate-500">
-            Radhe Clinic Console v2.0
-            <br />© 2026 Sutra Holistic Care
+            Madhav Clinic Console v2.0
+            <br />© 2026 Madhav Clinic
           </div>
         </aside>
 
@@ -841,8 +868,9 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
                 {activeTab === "orders" && "Product Orders"}
                 {activeTab === "bookings" && "Telemedicine Consultations"}
                 {activeTab === "seminars" && "Seminars & Registrations"}
-                {activeTab === "products" && "Sutra Product Inventory"}
+                {activeTab === "products" && "Madhav Clinic Product Inventory"}
                 {activeTab === "subscribers" && "Subscribers & Marketing CRM"}
+                {activeTab === "settings" && "Clinic Settings"}
               </h1>
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-1 sm:w-72">
@@ -1969,6 +1997,99 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* ── SETTINGS ─────────────────────────────────────────────────────── */}
+          {activeTab === "settings" && (
+            <div className="animate-fade-in text-left space-y-6 max-w-2xl">
+              {/* Consultation Fee Card */}
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
+                    <IndianRupee className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-extrabold text-slate-800">Consultation Fee</h2>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Set the fee patients pay when booking a video consultation. Takes effect immediately.</p>
+                  </div>
+                </div>
+                <div className="px-6 py-6 space-y-5">
+                  {/* Current fee display */}
+                  <div className="rounded-xl bg-slate-50 border border-slate-200 px-5 py-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Current Fee</p>
+                      {loadingFee ? (
+                        <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+                      ) : currentFee !== null ? (
+                        <p className="text-3xl font-serif font-extrabold text-slate-800">₹ {Number(currentFee).toLocaleString("en-IN")}</p>
+                      ) : (
+                        <p className="text-sm text-red-500 font-semibold">Not configured — please set a fee below</p>
+                      )}
+                    </div>
+                    {currentFee !== null && (
+                      <span className="text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-full uppercase tracking-wider">Active</span>
+                    )}
+                  </div>
+
+                  {/* Update form */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-widest mb-2">New Fee (₹ INR)</label>
+                    <div className="flex gap-3">
+                      <div className="relative flex-1">
+                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-bold text-sm pointer-events-none">₹</span>
+                        <input
+                          type="number"
+                          min="1"
+                          step="1"
+                          value={feeInput}
+                          onChange={(e) => setFeeInput(e.target.value)}
+                          placeholder="e.g. 500"
+                          className="block w-full rounded-xl border border-slate-200 bg-white pl-8 pr-4 py-3 text-sm text-slate-800 font-semibold focus:border-primary-dark focus:outline-none shadow-xs"
+                        />
+                      </div>
+                      <button
+                        onClick={async () => {
+                          const parsed = parseInt(feeInput, 10);
+                          if (!parsed || parsed <= 0) {
+                            showError("Please enter a valid fee amount greater than 0.");
+                            return;
+                          }
+                          setSavingFee(true);
+                          try {
+                            const res = await updateConsultationFee(parsed);
+                            const updated = res?.fee ?? res;
+                            setCurrentFee(updated);
+                            setFeeInput(String(updated));
+                            showSuccess(`Consultation fee updated to ₹ ${Number(updated).toLocaleString("en-IN")}`);
+                          } catch (err) {
+                            showError(err.message || "Failed to update fee.");
+                          } finally {
+                            setSavingFee(false);
+                          }
+                        }}
+                        disabled={savingFee || !feeInput}
+                        className="flex items-center gap-2 rounded-xl bg-primary hover:bg-primary-dark text-text-dark hover:text-white px-6 py-3 text-xs font-bold uppercase tracking-wider shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                      >
+                        {savingFee ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                        {savingFee ? "Saving…" : "Save Fee"}
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-2">This fee will be charged when patients book a consultation. Old bookings keep their original fee.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Razorpay keys reminder */}
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl px-6 py-5 flex gap-4">
+                <div className="shrink-0 text-amber-500 mt-0.5"><ShieldCheck className="h-5 w-5" /></div>
+                <div>
+                  <p className="text-sm font-bold text-amber-800">Payment Gateway (Razorpay)</p>
+                  <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                    To switch from test → live payments, update <code className="bg-amber-100 px-1 rounded font-mono">RAZORPAY_ID</code> and <code className="bg-amber-100 px-1 rounded font-mono">RAZORPAY_KEY</code> in your server's <code className="bg-amber-100 px-1 rounded font-mono">.env</code> file with your verified live keys from the Razorpay dashboard, then redeploy.
+                  </p>
+                </div>
               </div>
             </div>
           )}

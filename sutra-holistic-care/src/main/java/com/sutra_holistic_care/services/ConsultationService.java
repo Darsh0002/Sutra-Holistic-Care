@@ -6,7 +6,6 @@ import com.sutra_holistic_care.exceptions.ResourceNotFoundException;
 import com.sutra_holistic_care.repositories.ConsultationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,8 +23,7 @@ public class ConsultationService {
 
     private final SubscriberService subscriberService;
 
-    @Value("${app.consultation.fee}")
-    private Long consultationFee;
+    private final AppSettingService appSettingService;
 
     // Morning: 9 AM – 1 PM  |  Evening: 4 PM – 8 PM
     private static final List<LocalTime> ALL_SLOTS = List.of(
@@ -45,7 +43,7 @@ public class ConsultationService {
                 .consultationDate(request.getConsultationDate())
                 .timeSlot(request.getTimeSlot())
                 .status(Consultation.ConsultationStatus.PENDING)
-                .fee(consultationFee)
+                .fee(appSettingService.getConsultationFee())
                 .bookedAt(LocalDateTime.now())
                 .build();
 

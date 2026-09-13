@@ -61,6 +61,13 @@ public class PaymentService {
 
     private PaymentOrderResponse createRazorpayOrder(Long amount, String referenceId,
                                                      String description, Payment.PaymentType type) {
+        // Idempotency: if a paid payment already exists for this reference, reject
+        paymentRepository.findByReferenceId(referenceId).ifPresent(existing -> {
+            if (existing.getStatus() == Payment.PaymentStatus.PAID) {
+                throw new BusinessException("Payment for this reference has already been completed.");
+            }
+        });
+
         try {
             JSONObject options = new JSONObject();
             options.put("amount", amount * 100L); // Razorpay expects paise
@@ -82,6 +89,8 @@ public class PaymentService {
                     .build();
             paymentRepository.save(payment);
 
+            log.info("Razorpay order created: {} for reference: {} amount: {}", rzpOrderId, referenceId, amount);
+
             return PaymentOrderResponse.builder()
                     .razorpayOrderId(rzpOrderId)
                     .referenceId(referenceId)
@@ -92,26 +101,37 @@ public class PaymentService {
                     .build();
 
         } catch (RazorpayException e) {
-            log.error("Razorpay order creation failed: {}", e.getMessage());
+            log.error("Razorpay order creation failed for reference {}: {}", referenceId, e.getMessage());
             throw new BusinessException("Payment gateway error: " + e.getMessage());
         }
     }
 
     public Payment verifyAndConfirmPayment(PaymentVerifyRequest request) {
-        // Verify HMAC signature
+        // Verify HMAC signature first — reject tampered responses immediately
         if (!verifySignature(request.getRazorpayOrderId(), request.getRazorpayPaymentId(),
                 request.getRazorpaySignature())) {
+            log.warn("Invalid payment signature for orderId: {}", request.getRazorpayOrderId());
             throw new BusinessException("Payment verification failed: invalid signature");
         }
 
         Payment payment = paymentRepository.findByRazorpayOrderId(request.getRazorpayOrderId())
                 .orElseThrow(() -> new BusinessException("Payment record not found"));
 
+        // Idempotency: do not re-process an already confirmed payment
+        if (payment.getStatus() == Payment.PaymentStatus.PAID) {
+            log.info("Payment {} already confirmed, skipping duplicate verify", request.getRazorpayOrderId());
+            return payment;
+        }
+
         payment.setRazorpayPaymentId(request.getRazorpayPaymentId());
         payment.setRazorpaySignature(request.getRazorpaySignature());
         payment.setStatus(Payment.PaymentStatus.PAID);
         payment.setPaidAt(LocalDateTime.now());
         Payment saved = paymentRepository.save(payment);
+
+        log.info("Payment verified and confirmed: orderId={} paymentId={} type={} amount={}",
+                request.getRazorpayOrderId(), request.getRazorpayPaymentId(),
+                payment.getPaymentType(), payment.getAmount());
 
         // Downstream confirmation
         switch (payment.getPaymentType()) {

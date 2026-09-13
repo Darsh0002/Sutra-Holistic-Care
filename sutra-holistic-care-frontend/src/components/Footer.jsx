@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import {
   MessageCircle,
@@ -177,7 +177,7 @@ const Footer = ({ onAdminToggle }) => {
           {/* Contact Info */}
           <div>
             <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4 font-sans">
-              Radhe Clinic
+              Madhav Clinic
             </h4>
             <ul className="space-y-2.5 text-xs text-slate-400">
               <li className="flex items-start gap-2.5">
@@ -241,7 +241,7 @@ const Footer = ({ onAdminToggle }) => {
         <div className="mt-12 pt-8 border-t border-slate-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-[10px] text-slate-500">
-              © {new Date().getFullYear()} Sutra Holistic Care / Radhe Clinic.
+              © {new Date().getFullYear()} Madhav Clinic / Madhav Clinic.
               All Rights Reserved.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] text-slate-500">

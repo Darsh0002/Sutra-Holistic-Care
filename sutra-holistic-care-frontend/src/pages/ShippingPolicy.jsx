@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import PolicyLayout from "../components/PolicyLayout";
 import {
   Globe,
@@ -92,7 +92,7 @@ const ShippingPolicy = ({ onAdminToggle }) => {
       {/* Intro */}
       <p className="text-sm leading-relaxed">
         Thank you for shopping with{" "}
-        <strong className="text-text-dark">Sutra Holistic Care</strong>. We are
+        <strong className="text-text-dark">Madhav Clinic</strong>. We are
         committed to delivering your order safely, efficiently, and on time.
         This Shipping Policy outlines our order processing, shipping timelines,
         and delivery procedures.
@@ -333,10 +333,10 @@ const ShippingPolicy = ({ onAdminToggle }) => {
       </p>
       <div className="rounded-xl bg-bg-cream border border-primary/10 p-5 space-y-3">
         <h4 className="font-serif text-lg font-bold text-text-dark">
-          Sutra Holistic Care
+          Madhav Clinic
         </h4>
         <p className="text-xs text-text-light">
-          Founder: Dr. Keval Dankhara (BHMS) &bull; Clinic: Radhe Clinic
+          Founder: Dr. Keval Dankhara (BHMS) &bull; Clinic: Madhav Clinic
         </p>
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2.5">

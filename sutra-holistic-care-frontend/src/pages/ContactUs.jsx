@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import PolicyLayout from "../components/PolicyLayout";
 import {
@@ -132,7 +132,7 @@ const ContactUs = ({ onAdminToggle }) => {
               Legal Business Name
             </span>
             <p className="font-medium text-text-dark mt-1 text-sm">
-              Sutra Holistic Care
+              Madhav Clinic
             </p>
           </div>
           <div>
@@ -148,7 +148,7 @@ const ContactUs = ({ onAdminToggle }) => {
               Clinic
             </span>
             <p className="font-medium text-text-dark mt-1 text-sm">
-              Radhe Clinic
+              Madhav Clinic
             </p>
           </div>
           <div>
@@ -174,7 +174,7 @@ const ContactUs = ({ onAdminToggle }) => {
                 Business Address
               </h3>
               <p className="text-sm text-slate-300 leading-relaxed">
-                Sutra Holistic Care / Radhe Clinic
+                Madhav Clinic / Madhav Clinic
                 <br />
                 C 401 Opera Palm, Kholvad Gam, Kamrej
                 <br />
@@ -287,7 +287,7 @@ const ContactUs = ({ onAdminToggle }) => {
       {/* Closing */}
       <p className="mt-8 text-sm text-text-light text-center leading-relaxed">
         We appreciate your trust in{" "}
-        <strong className="text-text-dark">Sutra Holistic Care</strong> and look
+        <strong className="text-text-dark">Madhav Clinic</strong> and look
         forward to supporting you on your wellness journey.
       </p>
     </PolicyLayout>

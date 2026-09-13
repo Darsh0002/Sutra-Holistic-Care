@@ -15,7 +15,7 @@ const Navbar = ({ onAdminLoginClick, currentView, onViewToggle }) => {
 
   const navLinks = [
     { label: "The Doctor", href: "#doctor" },
-    { label: "Sutra Products", href: "#products" },
+    { label: "Products", href: "#products" },
     { label: "Upcoming Seminars", href: "#seminars" },
     { label: "Video Consultation", href: "#consultation" },
   ];
@@ -51,10 +51,10 @@ const Navbar = ({ onAdminLoginClick, currentView, onViewToggle }) => {
             </div>
             <div>
               <span className="font-serif text-lg font-bold tracking-wide text-text-dark block leading-none">
-                SUTRA
+                MADHAV
               </span>
               <span className="text-xs tracking-widest text-primary-dark font-sans uppercase">
-                Holistic Care
+                Clinic
               </span>
             </div>
           </Link>

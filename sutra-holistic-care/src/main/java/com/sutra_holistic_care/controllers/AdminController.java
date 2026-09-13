@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.List;
 
 @RestController
@@ -22,6 +23,21 @@ public class AdminController {
     private final SeminarService seminarService;
     private final ProductService productService;
     private final RegistrationService registrationService;
+    private final AppSettingService appSettingService;
+
+    // ─── Settings ────────────────────────────────────────────────
+
+    @GetMapping("/settings/consultation-fee")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getConsultationFee() {
+        long fee = appSettingService.getConsultationFee();
+        return ResponseEntity.ok(ApiResponse.success("Consultation fee retrieved", Map.of("fee", fee)));
+    }
+
+    @PutMapping("/settings/consultation-fee")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> updateConsultationFee(@RequestParam long fee) {
+        long updated = appSettingService.setConsultationFee(fee);
+        return ResponseEntity.ok(ApiResponse.success("Consultation fee updated successfully", Map.of("fee", updated)));
+    }
 
     // ─── Dashboard ───────────────────────────────────────────────
 

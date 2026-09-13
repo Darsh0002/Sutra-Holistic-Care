@@ -123,7 +123,7 @@ const ProductList = ({ products, onProductInquiry }) => {
   const openWhatsAppPayment = (order) => {
     const pack = buyProduct?.packs?.[selectedPackIndex];
     const msg = encodeURIComponent(
-      `Hi Dr. Keval, I have placed an order on your SUTRA Holistic Care portal.\n\nOrder ID: ${order?.id || 'N/A'}\nProduct: ${buyProduct?.name}\nPack: ${pack ? `${pack.weight}g` : ''}\nQty: ${orderForm.quantity}\nName: ${orderForm.name}\nPhone: ${orderForm.mobile}\nAddress: ${orderForm.address}\n\nPlease share the payment link. Thank you!`
+      `Hi Dr. Keval, I have placed an order on your Madhav Clinic portal.\n\nOrder ID: ${order?.id || 'N/A'}\nProduct: ${buyProduct?.name}\nPack: ${pack ? `${pack.weight}g` : ''}\nQty: ${orderForm.quantity}\nName: ${orderForm.name}\nPhone: ${orderForm.mobile}\nAddress: ${orderForm.address}\n\nPlease share the payment link. Thank you!`
     );
     window.open(`https://wa.me/919537051626?text=${msg}`, '_blank');
   };
@@ -136,7 +136,7 @@ const ProductList = ({ products, onProductInquiry }) => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold tracking-widest text-primary-dark font-sans uppercase">DOCTOR FORMULATED</span>
           <h2 className="mt-3 font-serif text-4xl font-extrabold tracking-tight text-text-dark sm:text-5xl">
-            Blend Sutra Products
+            Madhav Clinic Products
           </h2>
           <p className="mt-4 text-base text-text-light max-w-xl mx-auto">
             Handcrafted in small batches by Dr. Keval Dankhara. Made from 100% wild-harvested herbs, 
@@ -188,7 +188,7 @@ const ProductList = ({ products, onProductInquiry }) => {
                     {product.name}
                   </h3>
                   <p className="text-xs text-primary-dark font-semibold tracking-wider font-sans uppercase mt-1">
-                    Radhe Clinic Special
+                    Madhav Clinic Special
                   </p>
                   <p className="mt-3 text-sm text-text-light line-clamp-2 leading-relaxed">
                     {product.description || 'Doctor-formulated holistic blend.'}
@@ -209,7 +209,7 @@ const ProductList = ({ products, onProductInquiry }) => {
                   )}
                 </div>
 
-                {/* Pricing & Footer Actions */}
+                {/* Condition pills - herbal products */}
                 <div className="mt-6 pt-6 border-t border-primary/10 flex items-center justify-between">
                   <div>
                     <span className="text-xs text-text-light block leading-none">Starting at</span>

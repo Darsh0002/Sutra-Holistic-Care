@@ -64,7 +64,7 @@ const Hero = () => {
 
             {/* Brand promise */}
             <p className="mt-6 text-base text-text-light sm:text-lg leading-relaxed max-w-xl">
-              <strong className="text-text-dark">Sutra Holistic Care</strong> — founded by Dr. Keval Dankhara — blends
+              <strong className="text-text-dark">Madhav Clinic</strong> — founded by Dr. Keval Dankhara — blends
               classical herbal medicines, botanical blend &amp; lifestyle medicine to treat the <em>root cause</em>, not just symptoms.
             </p>
 
@@ -144,7 +144,7 @@ const Hero = () => {
                 {/* Header */}
                 <div className="relative z-10">
                   <span className="inline-block text-[10px] font-bold tracking-widest text-primary-dark uppercase bg-primary/10 px-3 py-1 rounded-full">
-                    Sutra Holistic Care
+                    Madhav Clinic
                   </span>
                   <h3 className="mt-3 font-serif text-xl font-extrabold text-text-dark leading-snug">
                     One clinic.<br />All-natural<br />Herbal support.
@@ -154,7 +154,7 @@ const Hero = () => {
                   </p>
                 </div>
 
-                {/* Condition pills — the 6 Sutra products */}
+                {/* Condition pills — herbal products */}
                 <div className="mt-6 flex flex-wrap gap-2 relative z-10">
                   {[
                     { label: 'Sleep',     emoji: '🌙', color: 'bg-indigo-50 border-indigo-200 text-indigo-700'   },

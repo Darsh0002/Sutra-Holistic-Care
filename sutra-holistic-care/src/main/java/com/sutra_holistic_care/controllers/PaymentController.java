@@ -4,6 +4,7 @@ import com.sutra_holistic_care.entities.Payment;
 import com.sutra_holistic_care.req.ApiResponse;
 import com.sutra_holistic_care.req.PaymentOrderResponse;
 import com.sutra_holistic_care.req.PaymentVerifyRequest;
+import com.sutra_holistic_care.services.AppSettingService;
 import com.sutra_holistic_care.services.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,13 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final AppSettingService appSettingService;
+
+    /** Public endpoint — returns the current consultation fee so the booking form can display it */
+    @GetMapping("/consultation-fee")
+    public ResponseEntity<ApiResponse<Long>> getConsultationFee() {
+        return ResponseEntity.ok(ApiResponse.success("Consultation fee", appSettingService.getConsultationFee()));
+    }
 
     @PostMapping("/order/{orderId}")
     public ResponseEntity<ApiResponse<PaymentOrderResponse>> createOrderPayment(@PathVariable String orderId) {

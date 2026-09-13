@@ -34,6 +34,11 @@ import {
   Send,
   Settings,
   IndianRupee,
+  Crown,
+  UserPlus,
+  History,
+  ShieldAlert as ShieldAlertIcon,
+  Filter,
 } from "lucide-react";
 import { getDashboardStats, getConsultationFee, updateConsultationFee, createAdminOrder } from "../services/adminService.js";
 import {
@@ -64,6 +69,13 @@ import {
   createProductAdmin,
   deleteProductAdmin,
 } from "../services/productService.js";
+import { getAdminInfo, isSuperAdmin, getAdminRole } from "../services/authService.js";
+import {
+  getAllStaff,
+  addStaff,
+  deleteStaff,
+  getActivityLogs,
+} from "../services/staffService.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Helper: empty product form state
@@ -109,6 +121,11 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Current Logged in Admin Info & Role
+  const adminInfo = getAdminInfo();
+  const adminRole = adminInfo?.role || "STAFF";
+  const isSuperAdminUser = adminRole === "SUPER_ADMIN";
+
   // Data states
   const [stats, setStats] = useState(null);
   const [consultations, setConsultations] = useState([]);
@@ -118,6 +135,21 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
   const [allSeminars, setAllSeminars] = useState([]);
   const [subscribers, setSubscribers] = useState([]);
   const [subStats, setSubStats] = useState(null);
+
+  // Staff & Logs States (SUPER_ADMIN only)
+  const [staffList, setStaffList] = useState([]);
+  const [loadingStaff, setLoadingStaff] = useState(false);
+  const [staffModal, setStaffModal] = useState(false);
+  const [staffForm, setStaffForm] = useState({ name: "", email: "", mobile: "", password: "" });
+  const [savingStaff, setSavingStaff] = useState(false);
+  const [deleteStaffTarget, setDeleteStaffTarget] = useState(null);
+  const [deletingStaff, setDeletingStaff] = useState(false);
+
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+  const [logSearchTerm, setLogSearchTerm] = useState("");
+  const [logFilterAction, setLogFilterAction] = useState("");
+  const [logFilterStaff, setLogFilterStaff] = useState("");
 
   // Loading states
   const [loadingStats, setLoadingStats] = useState(true);
@@ -260,6 +292,30 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
     }
   }, []);
 
+  const fetchStaff = useCallback(async () => {
+    if (!isSuperAdminUser) return;
+    setLoadingStaff(true);
+    try {
+      setStaffList(await getAllStaff());
+    } catch {
+      setStaffList([]);
+    } finally {
+      setLoadingStaff(false);
+    }
+  }, [isSuperAdminUser]);
+
+  const fetchLogs = useCallback(async () => {
+    if (!isSuperAdminUser) return;
+    setLoadingLogs(true);
+    try {
+      setActivityLogs(await getActivityLogs());
+    } catch {
+      setActivityLogs([]);
+    } finally {
+      setLoadingLogs(false);
+    }
+  }, [isSuperAdminUser]);
+
   useEffect(() => {
     fetchStats();
     fetchConsultations();
@@ -268,6 +324,10 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
     fetchOrders();
     fetchAllSeminars();
     fetchSubscribers();
+    if (isSuperAdminUser) {
+      fetchStaff();
+      fetchLogs();
+    }
   }, [
     fetchStats,
     fetchConsultations,
@@ -276,7 +336,49 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
     fetchOrders,
     fetchAllSeminars,
     fetchSubscribers,
+    fetchStaff,
+    fetchLogs,
+    isSuperAdminUser,
   ]);
+
+  // ─── Staff Handlers ───────────────────────────────────────────────────────
+
+  const handleSaveStaff = async (e) => {
+    e.preventDefault();
+    if (!staffForm.name || !staffForm.email || !staffForm.password) {
+      showError("Name, Email, and Password are required.");
+      return;
+    }
+    setSavingStaff(true);
+    try {
+      const created = await addStaff(staffForm);
+      setStaffList((prev) => [created, ...prev]);
+      showSuccess(`Staff account for "${created.name}" created successfully.`);
+      setStaffModal(false);
+      setStaffForm({ name: "", email: "", mobile: "", password: "" });
+      fetchLogs();
+    } catch (err) {
+      showError(err.message || "Failed to create staff account.");
+    } finally {
+      setSavingStaff(false);
+    }
+  };
+
+  const handleDeleteStaff = async () => {
+    if (!deleteStaffTarget) return;
+    setDeletingStaff(true);
+    try {
+      await deleteStaff(deleteStaffTarget.id);
+      setStaffList((prev) => prev.filter((s) => s.id !== deleteStaffTarget.id));
+      showSuccess(`Staff account for "${deleteStaffTarget.name}" deleted.`);
+      setDeleteStaffTarget(null);
+      fetchLogs();
+    } catch (err) {
+      showError(err.message || "Failed to delete staff account.");
+    } finally {
+      setDeletingStaff(false);
+    }
+  };
 
   // ─── Feedback helpers ──────────────────────────────────────────────────────
 
@@ -817,13 +919,26 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-text-dark text-primary shrink-0">
             <ShieldCheck className="h-5 w-5" />
           </div>
-          <div className="hidden sm:block">
-            <span className="font-serif text-base font-bold text-text-dark leading-none block">
-              Dr. Keval's Console
-            </span>
-            <span className="text-[10px] font-sans font-bold text-emerald-600 uppercase tracking-widest leading-none block mt-0.5">
-              Madhav Clinic Dashboard
-            </span>
+          <div className="hidden sm:flex items-center gap-2">
+            <div>
+              <span className="font-serif text-base font-bold text-text-dark leading-none block">
+                {adminInfo?.name || "Dr. Keval's Console"}
+              </span>
+              <div className="flex items-center gap-1.5 mt-1">
+                {isSuperAdminUser ? (
+                  <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    <Crown className="h-3 w-3 text-amber-600" /> Super Admin
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-900 border border-blue-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    <UserCheck className="h-3 w-3 text-blue-600" /> Staff
+                  </span>
+                )}
+                <span className="text-[10px] font-sans font-bold text-emerald-600 uppercase tracking-widest leading-none">
+                  Madhav Clinic
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -918,11 +1033,25 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
                 icon: Users,
                 label: `Subscribers (${subscribers.length})`,
               },
-              {
-                id: "settings",
-                icon: Settings,
-                label: "Settings",
-              },
+              ...(isSuperAdminUser
+                ? [
+                    {
+                      id: "staff",
+                      icon: UserPlus,
+                      label: `Staff Management (${staffList.length})`,
+                    },
+                    {
+                      id: "logs",
+                      icon: History,
+                      label: `Staff Activity Logs (${activityLogs.length})`,
+                    },
+                    {
+                      id: "settings",
+                      icon: Settings,
+                      label: "Settings",
+                    },
+                  ]
+                : []),
             ].map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
@@ -2195,8 +2324,384 @@ const AdminDashboard = ({ onLogout, onBackToSite }) => {
               </div>
             </div>
           )}
+
+          {/* ── STAFF MANAGEMENT TAB (SUPER_ADMIN ONLY) ────────────────────────── */}
+          {activeTab === "staff" && isSuperAdminUser && (
+            <div className="animate-fade-in text-left space-y-6">
+              {/* Header card with Add Staff button */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                      <Crown className="h-3 w-3 text-amber-600" /> Super Admin Control
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">Team Access Management</span>
+                  </div>
+                  <h2 className="text-xl font-serif font-bold text-slate-800 mt-1">Staff Account Management</h2>
+                  <p className="text-xs text-slate-500 mt-1 max-w-xl">
+                    Create and manage staff accounts. Staff members can handle manual operations (orders, consultations, products, seminars) but cannot access system settings or add other staff members.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setStaffForm({ name: "", email: "", mobile: "", password: "" });
+                    setStaffModal(true);
+                    setActionError("");
+                  }}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary-dark text-text-dark hover:text-white px-5 py-3 text-xs font-bold uppercase tracking-wider shadow-md transition-all shrink-0"
+                >
+                  <UserPlus className="h-4 w-4" /> Add Staff Member
+                </button>
+              </div>
+
+              {/* Staff List Table */}
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+                {loadingStaff ? (
+                  <div className="flex justify-center py-16">
+                    <Loader2 className="h-8 w-8 animate-spin text-slate-300" />
+                  </div>
+                ) : staffList.length === 0 ? (
+                  <div className="text-center py-16">
+                    <UserPlus className="h-12 w-12 text-slate-200 mx-auto mb-3" />
+                    <p className="text-slate-500 font-semibold text-sm">No staff accounts created yet.</p>
+                    <p className="text-slate-400 text-xs mt-1">Click "Add Staff Member" above to create an account for your staff.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-slate-200 text-xs">
+                      <thead className="bg-slate-50 font-bold uppercase tracking-wider text-slate-500">
+                        <tr>
+                          <th className="px-5 py-4 text-left">Staff Member</th>
+                          <th className="px-5 py-4 text-left">Contact Info</th>
+                          <th className="px-5 py-4 text-left">Role</th>
+                          <th className="px-5 py-4 text-left">Account Created</th>
+                          <th className="px-5 py-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {staffList.map((member) => {
+                          const isSuper = member.role === "SUPER_ADMIN";
+                          return (
+                            <tr key={member.id} className="hover:bg-slate-50/50 transition-colors">
+                              <td className="px-5 py-4">
+                                <div className="flex items-center gap-3">
+                                  <div className={`h-9 w-9 rounded-full flex items-center justify-center font-bold text-sm ${isSuper ? "bg-amber-100 text-amber-800 border border-amber-300" : "bg-blue-100 text-blue-800 border border-blue-200"}`}>
+                                    {member.name ? member.name.charAt(0).toUpperCase() : "S"}
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-slate-800 text-sm">{member.name}</p>
+                                    <p className="text-[11px] text-slate-400">{member.email}</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-5 py-4 text-slate-600 font-medium">
+                                {member.mobile || "—"}
+                              </td>
+                              <td className="px-5 py-4">
+                                {isSuper ? (
+                                  <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                    <Crown className="h-3 w-3 text-amber-600" /> Super Admin
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-900 border border-blue-300 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                    <UserCheck className="h-3 w-3 text-blue-600" /> Staff
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-5 py-4 text-slate-400 text-[11px]">
+                                {member.createdAt ? new Date(member.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+                              </td>
+                              <td className="px-5 py-4 text-right">
+                                {isSuper ? (
+                                  <span className="text-[10px] text-slate-400 italic">Protected</span>
+                                ) : (
+                                  <button
+                                    onClick={() => setDeleteStaffTarget(member)}
+                                    className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" /> Delete Staff
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── STAFF ACTIVITY LOGS TAB (SUPER_ADMIN ONLY) ────────────────────────── */}
+          {activeTab === "logs" && isSuperAdminUser && (
+            <div className="animate-fade-in text-left space-y-6">
+              {/* Header */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-violet-100 text-violet-800 border border-violet-300 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                      <History className="h-3 w-3 text-violet-600" /> Audit Trail
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">Real-Time Operations Monitor</span>
+                  </div>
+                  <h2 className="text-xl font-serif font-bold text-slate-800 mt-1">Staff Activity & Action Logs</h2>
+                  <p className="text-xs text-slate-500 mt-1 max-w-2xl">
+                    View real-time audit log of all actions performed by staff members and super admins on orders, consultations, products, seminars, settings, and team accounts.
+                  </p>
+                </div>
+                <button
+                  onClick={fetchLogs}
+                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2.5 text-xs font-bold transition-all shrink-0"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${loadingLogs ? "animate-spin" : ""}`} /> Refresh Logs
+                </button>
+              </div>
+
+              {/* Filters */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-col sm:flex-row gap-3 items-center justify-between">
+                <div className="relative w-full sm:w-72">
+                  <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={logSearchTerm}
+                    onChange={(e) => setLogSearchTerm(e.target.value)}
+                    placeholder="Search logs by staff name, email, action..."
+                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-primary-dark focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex w-full sm:w-auto gap-2 items-center">
+                  <select
+                    value={logFilterAction}
+                    onChange={(e) => setLogFilterAction(e.target.value)}
+                    className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 focus:outline-none"
+                  >
+                    <option value="">All Entity Types</option>
+                    <option value="ORDER">Orders</option>
+                    <option value="CONSULTATION">Consultations</option>
+                    <option value="PRODUCT">Products</option>
+                    <option value="SEMINAR">Seminars</option>
+                    <option value="STAFF">Staff Management</option>
+                    <option value="SETTING">Settings</option>
+                  </select>
+
+                  {(logSearchTerm || logFilterAction) && (
+                    <button
+                      onClick={() => { setLogSearchTerm(""); setLogFilterAction(""); }}
+                      className="text-xs text-red-600 hover:underline font-bold px-2 py-1"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Logs Table */}
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+                {loadingLogs ? (
+                  <div className="flex justify-center py-16">
+                    <Loader2 className="h-8 w-8 animate-spin text-slate-300" />
+                  </div>
+                ) : activityLogs.length === 0 ? (
+                  <div className="text-center py-16">
+                    <History className="h-12 w-12 text-slate-200 mx-auto mb-3" />
+                    <p className="text-slate-500 font-semibold text-sm">No activity logs recorded yet.</p>
+                    <p className="text-slate-400 text-xs mt-1">Actions performed by staff or admins will automatically appear here.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-slate-200 text-xs">
+                      <thead className="bg-slate-50 font-bold uppercase tracking-wider text-slate-500">
+                        <tr>
+                          <th className="px-5 py-4 text-left">Timestamp</th>
+                          <th className="px-5 py-4 text-left">Performed By</th>
+                          <th className="px-5 py-4 text-left">Action</th>
+                          <th className="px-5 py-4 text-left">Entity</th>
+                          <th className="px-5 py-4 text-left">Details</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {activityLogs
+                          .filter((log) => {
+                            const matchSearch = !logSearchTerm ||
+                              (log.staffName && log.staffName.toLowerCase().includes(logSearchTerm.toLowerCase())) ||
+                              (log.staffEmail && log.staffEmail.toLowerCase().includes(logSearchTerm.toLowerCase())) ||
+                              (log.action && log.action.toLowerCase().includes(logSearchTerm.toLowerCase())) ||
+                              (log.details && log.details.toLowerCase().includes(logSearchTerm.toLowerCase()));
+                            const matchAction = !logFilterAction || log.entityType === logFilterAction;
+                            return matchSearch && matchAction;
+                          })
+                          .map((item) => (
+                            <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                              <td className="px-5 py-4 text-slate-500 text-[11px] whitespace-nowrap">
+                                <div className="flex items-center gap-1 font-mono text-slate-600">
+                                  <Clock className="h-3 w-3 text-slate-400 shrink-0" />
+                                  {item.timestamp ? new Date(item.timestamp).toLocaleString("en-IN", {
+                                    day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit"
+                                  }) : "—"}
+                                </div>
+                              </td>
+                              <td className="px-5 py-4">
+                                <div>
+                                  <p className="font-bold text-slate-800 text-xs">{item.staffName || item.staffEmail || "System"}</p>
+                                  <p className="text-[10px] text-slate-400">{item.staffEmail}</p>
+                                  <span className={`inline-block mt-0.5 text-[9px] font-extrabold px-2 py-0.2 rounded-full uppercase ${item.role === "SUPER_ADMIN" ? "bg-amber-100 text-amber-800 border border-amber-200" : "bg-blue-100 text-blue-800 border border-blue-200"}`}>
+                                    {item.role || "STAFF"}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-5 py-4">
+                                <span className="inline-flex items-center font-mono text-[10px] font-extrabold bg-slate-100 text-slate-800 border border-slate-300 px-2.5 py-1 rounded-md">
+                                  {item.action}
+                                </span>
+                              </td>
+                              <td className="px-5 py-4">
+                                <span className="inline-flex items-center text-[10px] font-bold bg-violet-50 text-violet-700 border border-violet-200 px-2 py-0.5 rounded-full">
+                                  {item.entityType}
+                                </span>
+                              </td>
+                              <td className="px-5 py-4 text-slate-700 font-medium text-xs max-w-md">
+                                {item.details}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </main>
       </div>
+
+      {/* ── Add Staff Modal (SUPER_ADMIN only) ────────────────────────── */}
+      {staffModal && isSuperAdminUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="relative w-full max-w-md bg-bg-cream rounded-3xl overflow-hidden shadow-2xl border border-primary/20">
+            <div className="h-1.5 w-full bg-gradient-to-r from-primary via-primary-dark to-primary" />
+            <div className="px-6 py-5 border-b border-primary/15 bg-white flex justify-between items-center">
+              <div>
+                <span className="text-[10px] font-bold tracking-widest text-primary-dark uppercase">Team Access</span>
+                <h3 className="font-serif text-xl font-bold text-text-dark">Add New Staff Member</h3>
+              </div>
+              <button onClick={() => setStaffModal(false)} className="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center text-text-light hover:bg-slate-100">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <form onSubmit={handleSaveStaff} className="p-6 space-y-4 text-left">
+              <div>
+                <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={staffForm.name}
+                  onChange={(e) => setStaffForm((f) => ({ ...f, name: e.target.value }))}
+                  placeholder="e.g. Ramesh Patel"
+                  className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2.5 text-xs text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">Email Address *</label>
+                <input
+                  type="email"
+                  required
+                  value={staffForm.email}
+                  onChange={(e) => setStaffForm((f) => ({ ...f, email: e.target.value }))}
+                  placeholder="staff@sutraholistic.com"
+                  className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2.5 text-xs text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">Mobile Number</label>
+                <input
+                  type="tel"
+                  value={staffForm.mobile}
+                  onChange={(e) => setStaffForm((f) => ({ ...f, mobile: e.target.value }))}
+                  placeholder="+91 9876543210"
+                  className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2.5 text-xs text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-text-dark uppercase tracking-wider mb-1">Account Password *</label>
+                <input
+                  type="password"
+                  required
+                  value={staffForm.password}
+                  onChange={(e) => setStaffForm((f) => ({ ...f, password: e.target.value }))}
+                  placeholder="••••••••"
+                  className="block w-full rounded-xl border border-primary/20 bg-bg-cream/45 px-3 py-2.5 text-xs text-text-dark focus:border-primary-dark focus:bg-white focus:outline-hidden"
+                />
+              </div>
+
+              {actionError && (
+                <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded-r-md text-xs text-red-700 font-semibold flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  {actionError}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setStaffModal(false)}
+                  className="flex-1 rounded-xl border border-slate-200 hover:bg-slate-50 py-3 text-xs font-bold uppercase tracking-wider text-text-light"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingStaff}
+                  className="flex-1 rounded-xl bg-primary text-text-dark font-bold hover:bg-primary-dark hover:text-white py-3 text-xs uppercase tracking-wider shadow-md disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {savingStaff ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+                  {savingStaff ? "Creating..." : "Create Staff"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete Staff Confirm Modal (SUPER_ADMIN only) ────────────────────────── */}
+      {deleteStaffTarget && isSuperAdminUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="w-full max-w-sm bg-bg-cream rounded-3xl overflow-hidden shadow-2xl border border-red-200">
+            <div className="h-1.5 w-full bg-red-500 shrink-0" />
+            <div className="p-6 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-red-500 mb-4">
+                <Trash2 className="h-7 w-7" />
+              </div>
+              <h3 className="font-serif text-lg font-bold text-text-dark">
+                Delete Staff Account?
+              </h3>
+              <p className="text-xs text-text-light mt-2 leading-relaxed">
+                Are you sure you want to delete staff account for <strong>"{deleteStaffTarget.name}"</strong> ({deleteStaffTarget.email})? This staff member will immediately lose access to the admin portal.
+              </p>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setDeleteStaffTarget(null)}
+                  className="flex-1 rounded-xl border border-slate-200 hover:bg-slate-50 py-3 text-xs font-bold uppercase tracking-wider text-text-light"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteStaff}
+                  disabled={deletingStaff}
+                  className="flex-1 rounded-xl bg-red-500 hover:bg-red-600 text-white py-3 text-xs font-bold uppercase tracking-wider shadow-md disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {deletingStaff ? <Loader2 className="h-4 w-4 animate-spin" /> : "Yes, Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Logout Confirmation Modal ────────────────────────────────────── */}
       {logoutConfirm && (

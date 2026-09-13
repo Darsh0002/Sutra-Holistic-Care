@@ -33,3 +33,19 @@ export const getAdminInfo = () => {
  * Check if admin is logged in (token present)
  */
 export const isAdminLoggedIn = () => !!localStorage.getItem('sutra_jwt_token');
+
+/**
+ * Get current logged in admin role
+ */
+export const getAdminRole = () => {
+  const info = getAdminInfo();
+  return info?.role || 'STAFF';
+};
+
+/**
+ * Check if currently logged in user is SUPER_ADMIN
+ */
+export const isSuperAdmin = () => {
+  const role = getAdminRole();
+  return role === 'SUPER_ADMIN';
+};
